@@ -25,11 +25,11 @@ import {
   SkinStage3D,
   type HoverInfo,
   type PoseId,
-  type ViewportInteractionMode,
 } from '../viewport/skinStage3D';
+import { AboutModal } from './aboutModal';
 import { ColorWorkshopPanel } from './colorPanel';
 import { SyncedEditor2D } from './editor2D';
-import { ICONS } from './icons';
+import { APP_ICON_URL, ICONS } from './icons';
 import { MannequinWidget } from './mannequinWidget';
 import { WardrobeModal } from './wardrobeModal';
 
@@ -77,6 +77,7 @@ export class SkinvilApp {
   private mannequin!: MannequinWidget;
   private colorPanel!: ColorWorkshopPanel;
   private wardrobeModal!: WardrobeModal;
+  private aboutModal!: AboutModal;
   private lastHover: HoverInfo | null = null;
 
   // UI element references
@@ -110,6 +111,7 @@ export class SkinvilApp {
   private langRoBtn!: HTMLButtonElement;
   private langEnBtn!: HTMLButtonElement;
   private langSwitchWrap!: HTMLElement;
+  private aboutLicenseBtn!: HTMLButtonElement;
 
   private paintLayerTitleEl!: HTMLElement;
   private paintLayerBaseBtn!: HTMLButtonElement;
@@ -131,14 +133,11 @@ export class SkinvilApp {
   private noiseBtn!: HTMLButtonElement;
   private noiseLabelEl!: HTMLElement;
 
-  private modePaintBtn!: HTMLButtonElement;
-  private modePaintLabelEl!: HTMLElement;
-  private modeRotateBtn!: HTMLButtonElement;
-  private modeRotateLabelEl!: HTMLElement;
   private resetViewBtn!: HTMLButtonElement;
   private resetViewLabelEl!: HTMLElement;
 
   private poseBtns!: Record<PoseId, HTMLButtonElement>;
+  private posePlayPauseBtn!: HTMLButtonElement;
   private statusTextEl!: HTMLElement;
   private hintPillEl!: HTMLElement;
   private toastEl!: HTMLElement;
@@ -207,7 +206,7 @@ export class SkinvilApp {
     brand.className = 'brand-lockup';
     const logoBox = document.createElement('div');
     logoBox.className = 'brand-logo-box';
-    logoBox.innerHTML = ICONS.logoAnvilBrush;
+    logoBox.innerHTML = ICONS.appLogo;
 
     const brandText = document.createElement('div');
     brandText.className = 'brand-text';
@@ -290,12 +289,20 @@ export class SkinvilApp {
 
     this.langSwitchWrap.append(this.langRoBtn, this.langEnBtn);
 
+    this.aboutLicenseBtn = document.createElement('button');
+    this.aboutLicenseBtn.type = 'button';
+    this.aboutLicenseBtn.className = 'block-btn header-btn license-badge-btn';
+    this.aboutLicenseBtn.addEventListener('click', () => {
+      this.aboutModal.open();
+    });
+
     primaryRight.append(
       this.openWardrobeBtn,
       this.forgeQuickBtn,
       this.exportBtn,
       makeDivider(),
-      this.langSwitchWrap
+      this.langSwitchWrap,
+      this.aboutLicenseBtn
     );
     topBarPrimary.append(primaryLeft, primaryRight);
 
@@ -596,31 +603,6 @@ export class SkinvilApp {
     const cameraHud = document.createElement('div');
     cameraHud.className = 'viewport-hud-top';
 
-    const modeSwitch = document.createElement('div');
-    modeSwitch.className = 'segmented-pill camera-mode-pill';
-
-    this.modePaintBtn = document.createElement('button');
-    this.modePaintBtn.type = 'button';
-    this.modePaintBtn.className = 'seg-btn active';
-    const mpIcon = document.createElement('span');
-    mpIcon.className = 'btn-icon';
-    mpIcon.innerHTML = ICONS.pencil;
-    this.modePaintLabelEl = document.createElement('span');
-    this.modePaintBtn.append(mpIcon, this.modePaintLabelEl);
-    this.modePaintBtn.addEventListener('click', () => this.setViewportMode('paint'));
-
-    this.modeRotateBtn = document.createElement('button');
-    this.modeRotateBtn.type = 'button';
-    this.modeRotateBtn.className = 'seg-btn';
-    const mrIcon = document.createElement('span');
-    mrIcon.className = 'btn-icon';
-    mrIcon.innerHTML = ICONS.orbitCamera;
-    this.modeRotateLabelEl = document.createElement('span');
-    this.modeRotateBtn.append(mrIcon, this.modeRotateLabelEl);
-    this.modeRotateBtn.addEventListener('click', () => this.setViewportMode('rotate'));
-
-    modeSwitch.append(this.modePaintBtn, this.modeRotateBtn);
-
     this.resetViewBtn = document.createElement('button');
     this.resetViewBtn.type = 'button';
     this.resetViewBtn.className = 'block-btn hud-reset-btn';
@@ -631,10 +613,13 @@ export class SkinvilApp {
     this.resetViewBtn.append(rvIcon, this.resetViewLabelEl);
     this.resetViewBtn.addEventListener('click', () => this.stage3D.resetView());
 
-    cameraHud.append(modeSwitch, this.resetViewBtn);
+    cameraHud.append(this.resetViewBtn);
 
     const bottomHud = document.createElement('div');
     bottomHud.className = 'viewport-hud-bottom';
+
+    const poseControlsRow = document.createElement('div');
+    poseControlsRow.className = 'pose-controls-row';
 
     const poseBar = document.createElement('div');
     poseBar.className = 'pose-bar';
@@ -655,6 +640,16 @@ export class SkinvilApp {
       poseBar.appendChild(btn);
     }
 
+    this.posePlayPauseBtn = document.createElement('button');
+    this.posePlayPauseBtn.type = 'button';
+    this.posePlayPauseBtn.className = 'pose-play-pause-btn';
+    this.posePlayPauseBtn.addEventListener('click', () => {
+      this.stage3D.toggleAnimationPaused();
+      this.syncPosePlayPauseButton();
+    });
+
+    poseControlsRow.append(poseBar, this.posePlayPauseBtn);
+
     const infoRow = document.createElement('div');
     infoRow.className = 'viewport-info-row';
     this.statusTextEl = document.createElement('span');
@@ -663,7 +658,7 @@ export class SkinvilApp {
     this.hintPillEl.className = 'hint-pill';
     infoRow.append(this.statusTextEl, this.hintPillEl);
 
-    bottomHud.append(poseBar, infoRow);
+    bottomHud.append(poseControlsRow, infoRow);
 
     this.toastEl = document.createElement('div');
     this.toastEl.className = 'toast-banner hidden';
@@ -727,18 +722,31 @@ export class SkinvilApp {
       onToast: (msg) => this.showToast(msg),
     });
 
+    this.aboutModal = new AboutModal(this.i18n);
+
     // --- 5. DRAG & DROP OVERLAY ---
     this.dropOverlayEl = document.createElement('div');
     this.dropOverlayEl.className = 'drop-overlay hidden';
     const dropCard = document.createElement('div');
     dropCard.className = 'drop-overlay-card';
+    const dropLogo = document.createElement('img');
+    dropLogo.className = 'drop-overlay-logo';
+    dropLogo.src = APP_ICON_URL;
+    dropLogo.alt = 'Skinvil';
+    dropLogo.draggable = false;
     this.dropOverlayTitleEl = document.createElement('h2');
     this.dropOverlaySubEl = document.createElement('p');
-    dropCard.append(this.dropOverlayTitleEl, this.dropOverlaySubEl);
+    dropCard.append(dropLogo, this.dropOverlayTitleEl, this.dropOverlaySubEl);
     this.dropOverlayEl.appendChild(dropCard);
 
     workspace.append(leftDock, centerArea, this.colorPanel.root);
-    shell.append(header, workspace, this.wardrobeModal.root, this.dropOverlayEl);
+    shell.append(
+      header,
+      workspace,
+      this.wardrobeModal.root,
+      this.aboutModal.root,
+      this.dropOverlayEl
+    );
     mountEl.appendChild(shell);
   }
 
@@ -1029,13 +1037,6 @@ export class SkinvilApp {
     this.editor2D.render();
   }
 
-  private setViewportMode(mode: ViewportInteractionMode): void {
-    this.stage3D.setInteractionMode(mode);
-    this.modePaintBtn.classList.toggle('active', mode === 'paint');
-    this.modeRotateBtn.classList.toggle('active', mode === 'rotate');
-    this.refreshHintLine();
-  }
-
   private syncToolButtons(): void {
     const activeLayer = this.settings.targetLayer ?? 'base';
     this.paintLayerBaseBtn.classList.toggle('active', activeLayer === 'base');
@@ -1064,12 +1065,19 @@ export class SkinvilApp {
       this.engine.undoCount > 0 ? String(this.engine.undoCount) : '';
   }
 
-  private refreshHintLine(): void {
+  private syncPosePlayPauseButton(): void {
+    const paused = this.stage3D.isPaused;
     const t = this.i18n.t;
-    this.hintPillEl.textContent =
-      this.stage3D.getInteractionMode() === 'rotate'
-        ? t.viewportHintRotate
-        : t.viewportHintPaint;
+    const label = paused ? t.posePlayTooltip : t.posePauseTooltip;
+    this.posePlayPauseBtn.innerHTML = paused ? ICONS.playMotion : ICONS.pauseMotion;
+    this.posePlayPauseBtn.classList.toggle('paused', paused);
+    this.posePlayPauseBtn.setAttribute('aria-pressed', String(paused));
+    this.posePlayPauseBtn.setAttribute('aria-label', label);
+    this.posePlayPauseBtn.title = label;
+  }
+
+  private refreshHintLine(): void {
+    this.hintPillEl.textContent = this.i18n.t.viewportHint;
   }
 
   private renderHoverStatus(): void {
@@ -1163,10 +1171,6 @@ export class SkinvilApp {
     this.noiseLabelEl.textContent = t.modNoise;
     this.noiseBtn.title = t.modNoiseTooltip;
 
-    this.modePaintLabelEl.textContent = t.modePaint;
-    this.modePaintBtn.title = t.modePaintTooltip;
-    this.modeRotateLabelEl.textContent = t.modeRotate;
-    this.modeRotateBtn.title = t.modeRotateTooltip;
     this.resetViewLabelEl.textContent = t.resetViewBtn;
     this.resetViewBtn.title = t.resetViewTooltip;
 
@@ -1178,9 +1182,14 @@ export class SkinvilApp {
     this.poseBtns.action.title = t.poseActionTooltip;
     this.poseBtns.spread.textContent = t.poseSpread;
     this.poseBtns.spread.title = t.poseSpreadTooltip;
+    this.syncPosePlayPauseButton();
 
     this.dropOverlayTitleEl.textContent = t.dropOverlayTitle;
     this.dropOverlaySubEl.textContent = t.dropOverlaySub;
+
+    this.aboutLicenseBtn.textContent = t.aboutLicenseBtn;
+    this.aboutLicenseBtn.title = t.aboutLicenseTooltip;
+    this.aboutLicenseBtn.setAttribute('aria-label', t.aboutLicenseTooltip);
 
     this.refreshHintLine();
     this.renderHoverStatus();
@@ -1188,6 +1197,11 @@ export class SkinvilApp {
 
   private bindGlobalShortcuts(): void {
     window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.aboutModal.isOpen) {
+        this.aboutModal.close();
+        return;
+      }
+
       if (e.key === 'Escape' && this.wardrobeModal.isOpen) {
         this.wardrobeModal.close();
         return;

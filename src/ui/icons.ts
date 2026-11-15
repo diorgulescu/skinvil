@@ -1,26 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-only
+import appIconUrl from '../../app-icon.svg';
+
+/** Canonical Skinvil application icon URL resolved from `/app-icon.svg`. */
+export const APP_ICON_URL: string = appIconUrl;
 
 /**
  * Crisp blocky pixel-inspired inline SVG icons (zero external icon fonts or CDNs).
  */
 export const ICONS = {
-  /** Skinvil Brand Emblem: Heavy Forged Anvil + Glowing Cyan Pixel-Brush */
-  logoAnvilBrush: `<svg viewBox="0 0 36 36" width="34" height="34" shape-rendering="crispEdges" aria-hidden="true">
-    <rect x="24" y="3" width="3" height="3" fill="#34D399"/>
-    <rect x="29" y="6" width="2" height="2" fill="#FBBF24"/>
-    <rect x="20" y="6" width="6" height="5" fill="#38BDF8"/>
-    <rect x="22" y="4" width="4" height="2" fill="#7DD3FC"/>
-    <rect x="21" y="11" width="5" height="3" fill="#E2E8F0"/>
-    <rect x="23" y="14" width="4" height="9" fill="#D97706"/>
-    <rect x="24" y="14" width="2" height="8" fill="#FBBF24"/>
-    <rect x="3" y="16" width="20" height="3" fill="#E2E8F0"/>
-    <rect x="6" y="19" width="16" height="4" fill="#94A3B8"/>
-    <rect x="3" y="19" width="3" height="2" fill="#64748B"/>
-    <rect x="10" y="23" width="9" height="5" fill="#64748B"/>
-    <rect x="11" y="23" width="5" height="5" fill="#94A3B8"/>
-    <rect x="6" y="28" width="17" height="3" fill="#CBD5E1"/>
-    <rect x="5" y="31" width="19" height="3" fill="#475569"/>
-  </svg>`,
+  /** Skinvil Official App Icon (`app-icon.svg`) rendered as an offline crisp image element */
+  appLogo: `<img class="brand-logo-img" src="${appIconUrl}" alt="Skinvil" draggable="false" />`,
 
   pencil: `<svg viewBox="0 0 24 24" width="24" height="24" shape-rendering="crispEdges" aria-hidden="true">
     <rect x="15" y="3" width="6" height="6" fill="#F43F5E"/>
@@ -83,17 +72,18 @@ export const ICONS = {
     <path d="M19 12H9C6 12 4 14 4 17V18"/>
   </svg>`,
 
-  orbitCamera: `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" aria-hidden="true">
-    <circle cx="12" cy="12" r="3.5"/>
-    <path d="M3 12C3 7.5 7 4 12 4C15.5 4 18.5 5.8 20 8.5"/>
-    <path d="M20 4V9H15"/>
-    <path d="M21 12C21 16.5 17 20 12 20C8.5 20 5.5 18.2 4 15.5"/>
-    <path d="M4 20V15H9"/>
-  </svg>`,
-
   resetView: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" aria-hidden="true">
     <rect x="7" y="7" width="10" height="10"/>
     <path d="M12 2V5M12 19V22M2 12H5M19 12H22"/>
+  </svg>`,
+
+  pauseMotion: `<svg viewBox="0 0 24 24" width="16" height="16" shape-rendering="crispEdges" aria-hidden="true">
+    <rect x="5" y="4" width="5" height="16" fill="currentColor"/>
+    <rect x="14" y="4" width="5" height="16" fill="currentColor"/>
+  </svg>`,
+
+  playMotion: `<svg viewBox="0 0 24 24" width="16" height="16" shape-rendering="crispEdges" aria-hidden="true">
+    <path d="M6 4L20 12L6 20Z" fill="currentColor"/>
   </svg>`,
 
   grid2D: `<svg viewBox="0 0 24 24" width="18" height="18" shape-rendering="crispEdges" aria-hidden="true">
@@ -128,12 +118,16 @@ export const ICONS = {
     <rect x="6" y="12" width="12" height="9" fill="#E2E8F0"/>
   </svg>`,
 
-  anvilForge: `<svg viewBox="0 0 24 24" width="19" height="19" shape-rendering="crispEdges" aria-hidden="true">
-    <rect x="16" y="2" width="3" height="3" fill="#34D399"/>
-    <rect x="2" y="8" width="18" height="3" fill="#F8FAFC"/>
-    <rect x="5" y="11" width="14" height="3" fill="#CBD5E1"/>
-    <rect x="8" y="14" width="8" height="4" fill="#94A3B8"/>
-    <rect x="4" y="18" width="16" height="3" fill="#E2E8F0"/>
+  anvilForge: `<svg viewBox="160 140 704 704" width="19" height="19" shape-rendering="crispEdges" aria-hidden="true">
+    <rect x="352" y="256" width="96" height="96" fill="#22D3EE"/>
+    <rect x="464" y="208" width="96" height="144" fill="#34D399"/>
+    <rect x="576" y="256" width="96" height="96" fill="#FDE68A"/>
+    <rect x="176" y="400" width="96" height="80" fill="#CBD5E1"/>
+    <rect x="272" y="368" width="544" height="144" fill="#F8FAFC"/>
+    <rect x="272" y="480" width="544" height="32" fill="#94A3B8"/>
+    <rect x="384" y="512" width="288" height="144" fill="#CBD5E1"/>
+    <rect x="304" y="656" width="448" height="64" fill="#E2E8F0"/>
+    <rect x="240" y="720" width="576" height="96" fill="#F8FAFC"/>
   </svg>`,
 
   upload: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" aria-hidden="true">

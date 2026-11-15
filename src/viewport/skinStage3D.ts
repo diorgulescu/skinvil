@@ -18,7 +18,6 @@ import {
 } from '../core/uvMap';
 
 export type PoseId = 'stand' | 'walk' | 'action' | 'spread';
-export type ViewportInteractionMode = 'paint' | 'rotate';
 
 export interface HoverInfo {
   partId: PartId;
@@ -28,15 +27,14 @@ export interface HoverInfo {
   py: number;
 }
 
-interface JointTransform {
-  pos: [number, number, number];
-  rot: [number, number, number];
+interface PaintRaycastHit {
+  partId: PartId;
+  layer: LayerKind;
+  face: FaceName;
+  rect: PixelRect;
+  px: number;
+  py: number;
 }
-
-type RigTargetPose = Record<
-  'head' | 'torso' | 'rightArm' | 'leftArm' | 'rightLeg' | 'leftLeg',
-  JointTransform
->;
 
 export class SkinStage3D {
   private readonly container: HTMLElement;
@@ -69,9 +67,12 @@ export class SkinStage3D {
 
   private model: ModelType = 'classic';
   private pose: PoseId = 'stand';
-  private interactionMode: ViewportInteractionMode = 'paint';
-  private spacePressed = false;
-  private isPaintingStroke = false;
+  private isPainting = false;
+  private isCameraManipulating = false;
+  private isAnimationPaused = false;
+  private animTime = 0;
+  private lastFrameTimestamp: number | null = null;
+  private lastIdlePointer: { x: number; y: number } | null = null;
   private activePointerId: number | null = null;
   private animFrameId = 0;
   private resizeObserver: ResizeObserver;
@@ -148,13 +149,15 @@ export class SkinStage3D {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.setSize(w, h);
     this.renderer.domElement.className = 'stage3d-canvas';
+    this.renderer.domElement.style.cursor = 'grab';
     container.appendChild(this.renderer.domElement);
 
-    // 3. OrbitControls (supporting right-drag orbit ALWAYS, plus left-drag on sky or in Rotate Mode)
+    // 3. OrbitControls (seamless desktop mouse controls: Left=Rotate on empty space, Middle=Pan, Right=Rotate, Wheel=Zoom)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.target.set(0, 16.2, 0);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.12;
+    this.controls.enableZoom = true;
     this.controls.minDistance = 16;
     this.controls.maxDistance = 120;
     this.controls.mouseButtons = {
@@ -241,7 +244,7 @@ export class SkinStage3D {
     this.scene.add(this.characterRoot);
 
     this.buildCharacterMeshes();
-    this.applyPoseImmediate(this.computePoseTargets(this.pose, this.model));
+    this.applyCurrentPose();
 
     // 6. 3D Voxel Pixel Hover Highlights (Primary + Mirror Ghost)
     const borderGeo = new THREE.EdgesGeometry(new THREE.PlaneGeometry(1, 1));
@@ -321,22 +324,22 @@ export class SkinStage3D {
       this.partMeshes[partId] = mesh;
     };
 
-    // Head & Hat pivot at neck (0, 24, 0), mesh centered at (0, +4, 0)
+    // Head & Hat pivot at neck base (0, 24, 0), geometry offset upward -> center at (0, +4, 0)
     attachPart('head', 'head', [0, 4, 0]);
     attachPart('hat', 'head', [0, 4, 0]);
 
-    // Torso & Jacket pivot at center (0, 18, 0), mesh at (0, 0, 0)
-    attachPart('torso', 'torso', [0, 0, 0]);
-    attachPart('jacket', 'torso', [0, 0, 0]);
+    // Torso & Jacket pivot at neck base (0, 24, 0), geometry offset downward -> center at (0, -6, 0)
+    attachPart('torso', 'torso', [0, -6, 0]);
+    attachPart('jacket', 'torso', [0, -6, 0]);
 
-    // Arms pivot near shoulder y=22, mesh centered at (0, -4, 0) -> spans y: +2..-10 relative to shoulder
+    // Arms & Sleeves pivot at shoulder (∓6 / ∓5.5, 22, 0), geometry offset downward -> center at (0, -4, 0)
     attachPart('rightArm', 'rightArm', [0, -4, 0]);
     attachPart('rightSleeve', 'rightArm', [0, -4, 0]);
 
     attachPart('leftArm', 'leftArm', [0, -4, 0]);
     attachPart('leftSleeve', 'leftArm', [0, -4, 0]);
 
-    // Legs pivot at hip y=12, mesh centered at (0, -6, 0) -> spans y: 0..-12 relative to hip
+    // Legs & Pants pivot at hip (∓2, 12, 0), geometry offset downward -> center at (0, -6, 0)
     attachPart('rightLeg', 'rightLeg', [0, -6, 0]);
     attachPart('rightPants', 'rightLeg', [0, -6, 0]);
 
@@ -344,66 +347,107 @@ export class SkinStage3D {
     attachPart('leftPants', 'leftLeg', [0, -6, 0]);
   }
 
-  private computePoseTargets(pose: PoseId, model: ModelType): RigTargetPose {
-    const armX = model === 'slim' ? 5.5 : 6.0;
+  private applyCurrentPose(): void {
+    const armX = this.model === 'slim' ? 5.5 : 6.0;
 
-    switch (pose) {
-      case 'stand':
-        return {
-          head: { pos: [0, 24, 0], rot: [0, 0, 0] },
-          torso: { pos: [0, 18, 0], rot: [0, 0, 0] },
-          rightArm: { pos: [-armX, 22, 0], rot: [0, 0, 0] },
-          leftArm: { pos: [armX, 22, 0], rot: [0, 0, 0] },
-          rightLeg: { pos: [-2, 12, 0], rot: [0, 0, 0] },
-          leftLeg: { pos: [2, 12, 0], rot: [0, 0, 0] },
-        };
+    // Anatomical joint pivots (Base + Outer share each THREE.Group so they never clip)
+    this.joints.head.position.set(0, 24, 0);
+    this.joints.torso.position.set(0, 24, 0);
+    this.joints.rightArm.position.set(-armX, 22, 0);
+    this.joints.leftArm.position.set(armX, 22, 0);
+    this.joints.rightLeg.position.set(-2, 12, 0);
+    this.joints.leftLeg.position.set(2, 12, 0);
 
-      case 'walk':
-        return {
-          head: { pos: [0, 24, 0], rot: [0.04, 0.14, 0] },
-          torso: { pos: [0, 18, 0], rot: [0, 0.06, 0] },
-          rightArm: { pos: [-armX, 22, 0], rot: [-0.58, 0, -0.05] },
-          leftArm: { pos: [armX, 22, 0], rot: [0.58, 0, 0.05] },
-          rightLeg: { pos: [-2, 12, 0], rot: [0.52, 0, 0] },
-          leftLeg: { pos: [2, 12, 0], rot: [-0.52, 0, 0] },
-        };
+    switch (this.pose) {
+      case 'stand': {
+        // Gentle idle breathing (~1.5 rad/s): subtle outward arm flare & slight head pitch/yaw
+        const t = this.animTime;
+        const armFlare = Math.sin(t * 1.5) * 0.04 + 0.05;
+        const armSwayX = Math.sin(t * 1.1) * 0.03;
+        this.characterRoot.position.set(0, 0, 0);
+        this.joints.head.rotation.set(
+          Math.sin(t * 1.2) * 0.035,
+          Math.sin(t * 0.7) * 0.06,
+          0
+        );
+        this.joints.torso.rotation.set(0, 0, 0);
+        this.joints.rightArm.rotation.set(armSwayX, 0, -armFlare);
+        this.joints.leftArm.rotation.set(-armSwayX, 0, armFlare);
+        this.joints.rightLeg.rotation.set(0, 0, 0);
+        this.joints.leftLeg.rotation.set(0, 0, 0);
+        break;
+      }
 
-      case 'action':
-        return {
-          head: { pos: [0, 24, 0], rot: [-0.1, -0.22, 0] },
-          torso: { pos: [0, 18, 0], rot: [0.06, -0.18, 0] },
-          rightArm: { pos: [-armX, 22, 0], rot: [-2.05, 0.15, -0.26] },
-          leftArm: { pos: [armX, 22, 0], rot: [0.55, -0.1, 0.28] },
-          rightLeg: { pos: [-2.2, 12, 0], rot: [0.42, 0, -0.12] },
-          leftLeg: { pos: [2.2, 12, 0], rot: [-0.46, 0, 0.12] },
-        };
+      case 'walk': {
+        // Authentic voxel walk cycle at 4.0 rad/s
+        const t = this.animTime * 4.0;
+        const swing = Math.sin(t);
+        this.characterRoot.position.set(0, Math.abs(Math.cos(t)) * 0.35, 0);
+        this.joints.head.rotation.set(0, Math.sin(t * 0.5) * 0.12, 0);
+        this.joints.torso.rotation.set(0, 0, 0);
+        this.joints.rightArm.rotation.set(-swing * 0.6, 0, -0.05);
+        this.joints.leftArm.rotation.set(swing * 0.6, 0, 0.05);
+        this.joints.rightLeg.rotation.set(swing * 0.65, 0, 0);
+        this.joints.leftLeg.rotation.set(-swing * 0.65, 0, 0);
+        break;
+      }
 
-      case 'spread':
-        // Spread / Exploded T-Pose: separates head, arms, and legs so every inner surface is easy to paint!
-        return {
-          head: { pos: [0, 26.6, 0], rot: [0, 0, 0] },
-          torso: { pos: [0, 18, 0], rot: [0, 0, 0] },
-          rightArm: { pos: [-(armX + 2.4), 22.4, 0], rot: [0, 0, -Math.PI * 0.46] },
-          leftArm: { pos: [armX + 2.4, 22.4, 0], rot: [0, 0, Math.PI * 0.46] },
-          rightLeg: { pos: [-3.6, 10.4, 0], rot: [0, 0, -0.3] },
-          leftLeg: { pos: [3.6, 10.4, 0], rot: [0, 0, 0.3] },
-        };
+      case 'action': {
+        // Dynamic sprint / hero cycle at 6.5 rad/s (0.95 rad limb swing, 0.15 rad forward torso lean;
+        // initial phase 0.85 holds a bold heroic stride even if paused immediately at t=0)
+        const s = this.animTime * 6.5 + 0.85;
+        const sprint = Math.sin(s);
+        this.characterRoot.position.set(0, Math.abs(Math.cos(s)) * 0.48, 0);
+        this.joints.head.rotation.set(-0.06, Math.sin(s * 0.5) * 0.14, 0);
+        this.joints.torso.rotation.set(0.15, 0, 0);
+        this.joints.rightArm.rotation.set(-sprint * 0.95, 0, -0.08);
+        this.joints.leftArm.rotation.set(sprint * 0.95, 0, 0.08);
+        this.joints.rightLeg.rotation.set(sprint * 0.95, 0, 0);
+        this.joints.leftLeg.rotation.set(-sprint * 0.95, 0, 0);
+        break;
+      }
+
+      case 'spread': {
+        // Strictly static T-Pose / Spread: arms +/-0.75 rad, legs +/-0.25 rad outward, zero motion
+        this.characterRoot.position.set(0, 0, 0);
+        this.joints.head.rotation.set(0, 0, 0);
+        this.joints.torso.rotation.set(0, 0, 0);
+        this.joints.rightArm.rotation.set(0, 0, -0.75);
+        this.joints.leftArm.rotation.set(0, 0, 0.75);
+        this.joints.rightLeg.rotation.set(0, 0, -0.25);
+        this.joints.leftLeg.rotation.set(0, 0, 0.25);
+        break;
+      }
     }
+
+    // Keep world matrices synchronized immediately so THREE.Raycaster hits moving limbs accurately
+    this.characterRoot.updateMatrixWorld(true);
   }
 
-  private applyPoseImmediate(targets: RigTargetPose): void {
-    (Object.keys(targets) as Array<keyof RigTargetPose>).forEach((k) => {
-      const g = this.joints[k];
-      const t = targets[k];
-      g.position.set(t.pos[0], t.pos[1], t.pos[2]);
-      g.rotation.set(t.rot[0], t.rot[1], t.rot[2]);
-    });
+  public stepAnimation(deltaSeconds: number): void {
+    const clamped = Math.min(Math.max(deltaSeconds, 0), 0.1);
+    const shouldAdvance =
+      clamped > 0 &&
+      !this.isPainting &&
+      !this.isAnimationPaused &&
+      this.pose !== 'spread';
+
+    if (shouldAdvance) {
+      this.animTime += clamped;
+    }
+
+    this.applyCurrentPose();
+
+    if (shouldAdvance && this.lastIdlePointer && !this.isCameraManipulating) {
+      this.updateIdleHoverAndCursor(this.lastIdlePointer.x, this.lastIdlePointer.y);
+    }
   }
 
   public setModelType(next: ModelType): void {
     if (this.model === next) return;
     this.model = next;
     this.buildCharacterMeshes();
+    this.applyCurrentPose();
   }
 
   public getModelType(): ModelType {
@@ -412,30 +456,42 @@ export class SkinStage3D {
 
   public setPose(next: PoseId): void {
     this.pose = next;
+    this.applyCurrentPose();
   }
 
   public getPose(): PoseId {
     return this.pose;
   }
 
-  public setInteractionMode(mode: ViewportInteractionMode): void {
-    this.interactionMode = mode;
-    this.renderer.domElement.style.cursor =
-      mode === 'rotate' ? 'grab' : 'crosshair';
-    if (mode === 'rotate') {
-      this.primaryHoverGroup.visible = false;
-      this.mirrorHoverGroup.visible = false;
-    }
+  public setAnimationPaused(paused: boolean): void {
+    this.isAnimationPaused = paused;
   }
 
-  public getInteractionMode(): ViewportInteractionMode {
-    return this.interactionMode;
+  public toggleAnimationPaused(): boolean {
+    this.isAnimationPaused = !this.isAnimationPaused;
+    return this.isAnimationPaused;
+  }
+
+  public get isPaused(): boolean {
+    return this.isAnimationPaused;
+  }
+
+  public get animationTime(): number {
+    return this.animTime;
   }
 
   public resetView(): void {
     this.camera.position.set(14, 21, 52);
     this.controls.target.set(0, 16.2, 0);
     this.controls.update();
+  }
+
+  public get isPaintingActive(): boolean {
+    return this.isPainting;
+  }
+
+  public get isControlsEnabled(): boolean {
+    return this.controls.enabled;
   }
 
   public setPartVisibility(partId: PartId, visible: boolean): void {
@@ -481,40 +537,27 @@ export class SkinStage3D {
     clientX: number,
     clientY: number,
     forEyedropper = false
-  ): {
-    partId: PartId;
-    layer: LayerKind;
-    face: FaceName;
-    rect: PixelRect;
-    px: number;
-    py: number;
-  } | null {
+  ): PaintRaycastHit | null {
     const bounds = this.renderer.domElement.getBoundingClientRect();
     if (bounds.width <= 0 || bounds.height <= 0) return null;
 
     this.pointerNDC.x = ((clientX - bounds.left) / bounds.width) * 2 - 1;
     this.pointerNDC.y = -((clientY - bounds.top) / bounds.height) * 2 + 1;
 
+    this.characterRoot.updateMatrixWorld(true);
     this.raycaster.setFromCamera(this.pointerNDC, this.camera);
-    const meshes = this.getVisibleMeshes();
-    const hits = this.raycaster.intersectObjects(meshes, false);
-    if (hits.length === 0) return null;
+    const visibleMeshes = this.getVisibleMeshes();
+    const intersects = this.raycaster.intersectObjects(visibleMeshes, false);
+    if (intersects.length === 0) return null;
 
     const specs = getSkinPartsSpec(this.model);
     const settings = this.getSettings();
     const targetLayer: LayerKind = settings.targetLayer ?? 'base';
     const isEraser = settings.tool === 'eraser' && !forEyedropper;
 
-    const candidates: Array<{
-      partId: PartId;
-      layer: LayerKind;
-      face: FaceName;
-      rect: PixelRect;
-      px: number;
-      py: number;
-    }> = [];
+    const candidates: PaintRaycastHit[] = [];
 
-    for (const hit of hits) {
+    for (const hit of intersects) {
       if (!hit.face || !hit.uv) continue;
       const mesh = hit.object as THREE.Mesh;
       const partId = mesh.userData.partId as PartId | undefined;
@@ -547,10 +590,13 @@ export class SkinStage3D {
 
     if (candidates.length === 0) return null;
 
-    // 1. Eyedropper: sample the front-most visible pixel with alpha > 0
+    // 1. Eyedropper: sample the front-most visible pixel with alpha > 0 (or fall back to a hit Base/solo mesh)
     if (forEyedropper) {
       return (
-        candidates.find((c) => this.engine.getPixel(c.px, c.py).a > 0) ?? null
+        candidates.find((c) => this.engine.getPixel(c.px, c.py).a > 0) ??
+        candidates.find((c) => c.layer === 'base') ??
+        candidates.find((c) => !this.visibility[specs[c.partId].counterpartId]) ??
+        null
       );
     }
 
@@ -571,10 +617,15 @@ export class SkinStage3D {
     const preferred = candidates.find((c) => c.layer === targetLayer);
     if (preferred) return preferred;
 
-    // 4. Fallback only if the counterpart part on targetLayer is explicitly hidden in the Mannequin
+    // 4. Fallback if the counterpart part on targetLayer is hidden in the Mannequin,
+    //    OR if an opaque Outer voxel protrudes beyond the Base silhouette.
     const fallback = candidates[0];
     const counterpart = specs[fallback.partId].counterpartId;
-    if (!this.visibility[counterpart]) {
+    if (
+      !this.visibility[counterpart] ||
+      (fallback.layer === 'outer' &&
+        this.engine.getPixel(fallback.px, fallback.py).a >= 128)
+    ) {
       return fallback;
     }
 
@@ -643,28 +694,13 @@ export class SkinStage3D {
     group.visible = true;
   }
 
-  private updateHoverAt(clientX: number, clientY: number): void {
-    const settings = this.getSettings();
-    const inRotateOnly = this.interactionMode === 'rotate' || this.spacePressed;
-    if (inRotateOnly) {
-      this.primaryHoverGroup.visible = false;
-      this.mirrorHoverGroup.visible = false;
-      this.onHoverChange?.(null);
-      return;
-    }
+  private hideHoverIndicators(): void {
+    this.primaryHoverGroup.visible = false;
+    this.mirrorHoverGroup.visible = false;
+    this.onHoverChange?.(null);
+  }
 
-    const hit = this.raycastPaintTarget(
-      clientX,
-      clientY,
-      settings.tool === 'eyedropper'
-    );
-    if (!hit) {
-      this.primaryHoverGroup.visible = false;
-      this.mirrorHoverGroup.visible = false;
-      this.onHoverChange?.(null);
-      return;
-    }
-
+  private showHoverForHit(hit: PaintRaycastHit, settings: PaintSettings): void {
     this.positionHoverIndicator(
       this.primaryHoverGroup,
       hit.partId,
@@ -707,43 +743,127 @@ export class SkinStage3D {
     });
   }
 
+  private isClientPointInsideCanvas(clientX: number, clientY: number): boolean {
+    const bounds = this.renderer.domElement.getBoundingClientRect();
+    return (
+      bounds.width > 0 &&
+      bounds.height > 0 &&
+      clientX >= bounds.left &&
+      clientX <= bounds.right &&
+      clientY >= bounds.top &&
+      clientY <= bounds.bottom
+    );
+  }
+
+  private updateIdleHoverAndCursor(clientX: number, clientY: number): void {
+    const settings = this.getSettings();
+    const hit = this.raycastPaintTarget(
+      clientX,
+      clientY,
+      settings.tool === 'eyedropper'
+    );
+    if (!hit) {
+      this.renderer.domElement.style.cursor = 'grab';
+      this.hideHoverIndicators();
+      return;
+    }
+    this.renderer.domElement.style.cursor = 'crosshair';
+    this.showHoverForHit(hit, settings);
+  }
+
+  private finalizeActivePaintStroke(pointerIdToRelease?: number): void {
+    if (!this.isPainting) return;
+    this.paintController.endStroke(this.getSettings());
+    const dom = this.renderer.domElement;
+    const pid = pointerIdToRelease ?? this.activePointerId;
+    if (pid !== null && pid !== undefined) {
+      try {
+        if (dom.hasPointerCapture(pid)) {
+          dom.releasePointerCapture(pid);
+        }
+      } catch {
+        // Ignore synthetic events without active pointer capture
+      }
+    }
+    this.activePointerId = null;
+    this.isPainting = false;
+  }
+
+  private readonly handleWindowPointerEnd = (e: PointerEvent): void => {
+    if (this.isPainting) {
+      this.finalizeActivePaintStroke(e.pointerId);
+    }
+    this.isPainting = false;
+    this.controls.enabled = true;
+
+    if (e.buttons === 0) {
+      this.isCameraManipulating = false;
+      if (
+        e.type === 'pointerup' &&
+        this.isClientPointInsideCanvas(e.clientX, e.clientY)
+      ) {
+        this.lastIdlePointer = { x: e.clientX, y: e.clientY };
+        this.updateIdleHoverAndCursor(e.clientX, e.clientY);
+      } else {
+        this.lastIdlePointer = null;
+        this.renderer.domElement.style.cursor = 'grab';
+        this.hideHoverIndicators();
+      }
+    }
+  };
+
   private bindEvents(): void {
     const dom = this.renderer.domElement;
 
-    // Use capture phase so we intercept mesh paint clicks BEFORE OrbitControls starts rotating!
+    // Suppress native browser context menu on the 3D canvas so right-drag orbit is seamless
+    dom.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Intercept pointerdown in CAPTURE phase BEFORE OrbitControls
     dom.addEventListener(
       'pointerdown',
       (e: PointerEvent) => {
-        const settings = this.getSettings();
-        const rotateOverride =
-          this.interactionMode === 'rotate' ||
-          this.spacePressed ||
-          e.altKey ||
-          e.button !== 0;
-
-        if (rotateOverride) {
+        // RIGHT CLICK (2) or MIDDLE CLICK (1): always rotate/pan camera, even over the character
+        if (e.button === 2 || e.button === 1) {
+          this.finalizeActivePaintStroke();
+          this.isPainting = false;
+          this.isCameraManipulating = true;
+          this.lastIdlePointer = null;
           this.controls.enabled = true;
+          dom.style.cursor = 'grabbing';
+          this.hideHoverIndicators();
           return;
         }
 
+        if (e.button !== 0) {
+          return;
+        }
+
+        // LEFT CLICK (0): raycast against currently visible character meshes
+        const settings = this.getSettings();
         const hit = this.raycastPaintTarget(
           e.clientX,
           e.clientY,
           settings.tool === 'eyedropper'
         );
 
-        // If user clicked empty background sky, let OrbitControls smoothly rotate camera!
+        // Clicked empty space OUTSIDE the character -> smooth left-drag orbit via OrbitControls
         if (!hit) {
+          this.isPainting = false;
+          this.isCameraManipulating = true;
+          this.lastIdlePointer = null;
           this.controls.enabled = true;
+          dom.style.cursor = 'grabbing';
+          this.hideHoverIndicators();
           return;
         }
 
-        // Hit a visible character mesh -> Paint!
-        e.stopImmediatePropagation();
+        // Clicked ON the character -> freeze OrbitControls & animation immediately, capture pointer & apply active tool
         e.preventDefault();
         this.controls.enabled = false;
-        this.isPaintingStroke = true;
+        this.isPainting = true;
+        this.isCameraManipulating = false;
         this.activePointerId = e.pointerId;
+        dom.style.cursor = 'crosshair';
         try {
           dom.setPointerCapture(e.pointerId);
         } catch {
@@ -756,68 +876,57 @@ export class SkinStage3D {
           face: hit.face,
           rect: hit.rect,
         });
-        this.updateHoverAt(e.clientX, e.clientY);
+        this.showHoverForHit(hit, this.getSettings());
       },
       { capture: true }
     );
 
     dom.addEventListener('pointermove', (e: PointerEvent) => {
-      if (this.isPaintingStroke && e.pointerId === this.activePointerId) {
+      if (this.isPainting) {
+        if (this.activePointerId !== null && e.pointerId !== this.activePointerId) {
+          return;
+        }
+        dom.style.cursor = 'crosshair';
         const settings = this.getSettings();
-        const hit = this.raycastPaintTarget(
-          e.clientX,
-          e.clientY,
-          settings.tool === 'eyedropper'
-        );
+        const hit = this.raycastPaintTarget(e.clientX, e.clientY, false);
         if (hit) {
-          this.paintController.continueStroke(hit.px, hit.py, settings, {
-            partId: hit.partId,
-            layer: hit.layer,
-            face: hit.face,
-            rect: hit.rect,
-          });
+          if (this.paintController.isDrawing) {
+            this.paintController.continueStroke(hit.px, hit.py, settings, {
+              partId: hit.partId,
+              layer: hit.layer,
+              face: hit.face,
+              rect: hit.rect,
+            });
+          }
+          this.showHoverForHit(hit, settings);
+        } else {
+          // Ignore empty-space misses mid-stroke without rotating the camera
+          this.hideHoverIndicators();
         }
+        return;
       }
-      this.updateHoverAt(e.clientX, e.clientY);
+
+      if (e.buttons === 0 && !this.isCameraManipulating) {
+        this.lastIdlePointer = { x: e.clientX, y: e.clientY };
+        this.updateIdleHoverAndCursor(e.clientX, e.clientY);
+      } else {
+        this.lastIdlePointer = null;
+        dom.style.cursor = 'grabbing';
+        this.hideHoverIndicators();
+      }
     });
 
-    const finishPointer = (e: PointerEvent) => {
-      if (!this.isPaintingStroke || e.pointerId !== this.activePointerId) return;
-      this.isPaintingStroke = false;
-      this.activePointerId = null;
-      this.paintController.endStroke(this.getSettings());
-      this.controls.enabled = true;
-      try {
-        if (dom.hasPointerCapture(e.pointerId)) {
-          dom.releasePointerCapture(e.pointerId);
-        }
-      } catch {
-        // Ignore
-      }
-    };
-
-    dom.addEventListener('pointerup', finishPointer);
-    dom.addEventListener('pointercancel', finishPointer);
     dom.addEventListener('pointerleave', () => {
-      if (!this.isPaintingStroke) {
-        this.primaryHoverGroup.visible = false;
-        this.mirrorHoverGroup.visible = false;
-        this.onHoverChange?.(null);
+      this.lastIdlePointer = null;
+      if (!this.isPainting && !this.isCameraManipulating) {
+        dom.style.cursor = 'grab';
+        this.hideHoverIndicators();
       }
     });
 
-    dom.addEventListener('contextmenu', (e) => e.preventDefault());
-
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && !(e.target instanceof HTMLInputElement)) {
-        this.spacePressed = true;
-      }
-    });
-    window.addEventListener('keyup', (e) => {
-      if (e.code === 'Space') {
-        this.spacePressed = false;
-      }
-    });
+    // Finalize stroke & always restore controls.enabled = true on window pointerup / pointercancel
+    window.addEventListener('pointerup', this.handleWindowPointerEnd);
+    window.addEventListener('pointercancel', this.handleWindowPointerEnd);
   }
 
   public handleResize(): void {
@@ -829,31 +938,30 @@ export class SkinStage3D {
   }
 
   private startLoop(): void {
-    const tick = () => {
+    this.controls.update();
+    this.renderer.render(this.scene, this.camera);
+
+    const tick = (now?: number) => {
       this.animFrameId = requestAnimationFrame(tick);
 
-      // Smoothly interpolate joint transforms toward active pose target
-      const targets = this.computePoseTargets(this.pose, this.model);
-      const alpha = 0.22;
-      (Object.keys(targets) as Array<keyof RigTargetPose>).forEach((k) => {
-        const g = this.joints[k];
-        const t = targets[k];
-        g.position.x += (t.pos[0] - g.position.x) * alpha;
-        g.position.y += (t.pos[1] - g.position.y) * alpha;
-        g.position.z += (t.pos[2] - g.position.z) * alpha;
-        g.rotation.x += (t.rot[0] - g.rotation.x) * alpha;
-        g.rotation.y += (t.rot[1] - g.rotation.y) * alpha;
-        g.rotation.z += (t.rot[2] - g.rotation.z) * alpha;
-      });
+      const timestamp = typeof now === 'number' ? now : performance.now();
+      const rawDelta =
+        this.lastFrameTimestamp === null
+          ? 0
+          : (timestamp - this.lastFrameTimestamp) / 1000;
+      this.lastFrameTimestamp = timestamp;
 
+      this.stepAnimation(rawDelta);
       this.controls.update();
       this.renderer.render(this.scene, this.camera);
     };
-    tick();
+    this.animFrameId = requestAnimationFrame(tick);
   }
 
   public dispose(): void {
     cancelAnimationFrame(this.animFrameId);
+    window.removeEventListener('pointerup', this.handleWindowPointerEnd);
+    window.removeEventListener('pointercancel', this.handleWindowPointerEnd);
     this.resizeObserver.disconnect();
     this.controls.dispose();
     this.renderer.dispose();
