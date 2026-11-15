@@ -1,0 +1,12 @@
+* text=auto eol=lf
+
+# Force LF for shell scripts and localization files
+*.sh text eol=lf
+*.lang text eol=lf
+
+# Binary assets
+*.png binary
+*.ico binary
+*.icns binary
+*.mcpack binary
+*.zip binary
