@@ -70,6 +70,8 @@ fn copy_rect_flipped_x(
 /// - Mirrors Right Arm `[40,16]` -> Left Arm `[32,48]`
 /// - Clears all newly added Outer Layer slots (`Jacket`, `Right/Left Sleeves`, `Right/Left Pants`)
 ///   and clears opaque-matte Hat outer `[32..64, 0..16]` if it has no transparent pixels.
+///
+/// KEEP IN SYNC with `convertLegacy64x32Rgba` in `src/core/wardrobeClient.ts`.
 pub fn convert_legacy_64x32_to_64x64(src: &RgbaImage) -> RgbaImage {
     let mut dst = RgbaImage::from_pixel(64, 64, Rgba([0, 0, 0, 0]));
 
@@ -123,6 +125,8 @@ pub fn convert_legacy_64x32_to_64x64(src: &RgbaImage) -> RgbaImage {
 /// Auto-detects Slim ("Alex") vs Classic ("Steve") geometry:
 /// Checks pixel `(54, 20)` on `64x64` or `(108, 40)` on `128x128`.
 /// `alpha == 0` -> `"slim"`, otherwise `"classic"`.
+///
+/// KEEP IN SYNC with `detectSkinGeometryFromRgba` in `src/core/wardrobeClient.ts`.
 pub fn detect_skin_geometry(img: &RgbaImage) -> &'static str {
     let (w, h) = img.dimensions();
     if w == 128 && h == 128 {

@@ -232,7 +232,9 @@ export class PaintController {
     }
     this.visitedInStroke.add(idx);
 
-    const layer: LayerKind = hit?.layer ?? (py >= 32 && px < 16 ? 'outer' : 'base');
+    // When hit is unknown (unused texture region), default to 'base' — the layer
+    // only affects eraser behavior, and 'base' is the more common target.
+    const layer: LayerKind = hit?.layer ?? 'base';
     const color = this.resolveWriteColor(layer, settings);
     this.engine.setPixel(px, py, color, true);
 
@@ -270,7 +272,7 @@ export class PaintController {
     const resolved = hit ?? findFaceAtPixel(px, py, settings.model);
     if (!resolved) return;
 
-    this.floodFillFaceRect(px, py, resolved.rect, resolved.layer, settings);
+    this.floodFillFaceRect(px, py, resolved.rect, settings);
 
     if (settings.mirrorSymmetry) {
       const mirrored = getMirroredTarget(px, py, settings.model, {
@@ -291,7 +293,6 @@ export class PaintController {
             mirrored.px,
             mirrored.py,
             mirrored.rect,
-            resolved.layer,
             settings
           );
         }
@@ -305,7 +306,6 @@ export class PaintController {
     startX: number,
     startY: number,
     rect: PixelRect,
-    layer: LayerKind,
     settings: PaintSettings
   ): void {
     const [rx, ry, rw, rh] = rect;
@@ -360,8 +360,6 @@ export class PaintController {
       stack.push([cx, cy - 1]);
     }
 
-    // Ignore unused `layer` parameter warning while keeping clear signature
-    void layer;
     this.engine.ctx.putImageData(imgData, 0, 0);
   }
 }

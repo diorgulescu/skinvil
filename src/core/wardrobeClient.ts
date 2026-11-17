@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import { invoke } from '@tauri-apps/api/core';
 import { open as openDialog, save as saveDialog } from '@tauri-apps/plugin-dialog';
+import { base64ToUint8Array, uint8ArrayToBase64 } from './bytes';
 import type { ModelType } from './uvMap';
 
 export interface ProcessedSkinResult {
@@ -40,6 +41,11 @@ export function isTauriDesktop(): boolean {
   return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 }
 
+/**
+ * Converts any display string (including Romanian diacritics) into a clean lowercase ASCII slug.
+ *
+ * KEEP IN SYNC with `sanitize_ascii_slug` in `src-tauri/src/mcpack.rs`.
+ */
 export function sanitizeAsciiSlug(input: string, fallback = 'skin'): string {
   const map: Record<string, string> = {
     ă: 'a', Ă: 'a', â: 'a', Â: 'a',
@@ -66,6 +72,8 @@ export function sanitizeAsciiSlug(input: string, fallback = 'skin'): string {
 /**
  * Pure TypeScript auto-detector matching the Rust backend rule:
  * Pixel (54, 20) on 64x64 or (108, 40) on 128x128: alpha === 0 -> 'slim', else 'classic'.
+ *
+ * KEEP IN SYNC with `detect_skin_geometry` in `src-tauri/src/skin_io.rs`.
  */
 export function detectSkinGeometryFromRgba(
   data: Uint8ClampedArray,
@@ -86,6 +94,8 @@ export function detectSkinGeometryFromRgba(
 /**
  * Pure TypeScript legacy 64x32 -> modern 64x64 converter (mirrors Right Arm/Leg to Left Arm/Leg
  * and clears Outer Layer regions), matching the Rust `image` crate implementation.
+ *
+ * KEEP IN SYNC with `convert_legacy_64x32_to_64x64` in `src-tauri/src/skin_io.rs`.
  */
 export function convertLegacy64x32Rgba(src: Uint8ClampedArray): Uint8ClampedArray {
   const dst = new Uint8ClampedArray(64 * 64 * 4);
@@ -201,24 +211,6 @@ export function renderPreviewDataUrlFromCanvas(
   oCtx.imageSmoothingEnabled = false;
   oCtx.drawImage(mini, 0, 0, 64, 128);
   return out.toDataURL('image/png');
-}
-
-function bytesToBase64(bytes: Uint8Array): string {
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
-
-function base64ToBytes(b64OrDataUrl: string): Uint8Array {
-  const clean = b64OrDataUrl.replace(/^data:image\/png;base64,/, '');
-  const bin = atob(clean);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) {
-    out[i] = bin.charCodeAt(i);
-  }
-  return out;
 }
 
 async function processImportedPngBrowserFallback(
@@ -484,7 +476,7 @@ export class WardrobeBackendClient {
     geometry: ModelType;
     pngBytes: Uint8Array;
   }): Promise<WardrobeEntry> {
-    const pngBase64 = bytesToBase64(params.pngBytes);
+    const pngBase64 = uint8ArrayToBase64(params.pngBytes);
     if (isTauriDesktop()) {
       return await invoke<WardrobeEntry>('wardrobe_save', {
         id: params.id ?? null,
@@ -626,7 +618,7 @@ export class WardrobeBackendClient {
         s.pngBase64 ??
         wardrobeItems.find((w) => w.id === s.wardrobeId)?.skinDataUrl ??
         '';
-      const pngData = base64ToBytes(b64);
+      const pngData = base64ToUint8Array(b64);
 
       skinEntries.push({
         localization_name: uSlug,
@@ -683,7 +675,7 @@ export class WardrobeBackendClient {
         if (!destFile) return null;
         const saved = await invoke<string>('save_skin_png_to_path', {
           destinationPath: destFile,
-          bytes: Array.from(base64ToBytes(skins[0].pngBase64)),
+          bytes: Array.from(base64ToUint8Array(skins[0].pngBase64)),
         });
         return [saved];
       }
@@ -708,7 +700,7 @@ export class WardrobeBackendClient {
         s.pngBase64 ??
         wardrobeItems.find((w) => w.id === s.wardrobeId)?.skinDataUrl ??
         '';
-      const bytes = base64ToBytes(b64);
+      const bytes = base64ToUint8Array(b64);
       const blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'image/png' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

@@ -63,6 +63,8 @@ struct BedrockSkinsJson {
 }
 
 /// Converts any display string (including Romanian diacritics) into a clean lowercase ASCII slug.
+///
+/// KEEP IN SYNC with `sanitizeAsciiSlug` in `src/core/wardrobeClient.ts`.
 pub fn sanitize_ascii_slug(input: &str, fallback: &str) -> String {
     let mut out = String::with_capacity(input.len());
     let mut prev_underscore = false;

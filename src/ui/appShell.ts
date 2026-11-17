@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import { getCurrentWebview } from '@tauri-apps/api/webview';
+import { base64ToUint8Array, uint8ArrayToBase64 } from '../core/bytes';
 import {
   PaintController,
   type BaseEraserMode,
@@ -28,28 +28,11 @@ import {
   type ViewportInteractionMode,
 } from '../viewport/skinStage3D';
 import { ColorWorkshopPanel } from './colorPanel';
+import { DragDropZone } from './dragDrop';
 import { SyncedEditor2D } from './editor2D';
 import { ICONS } from './icons';
 import { MannequinWidget } from './mannequinWidget';
 import { WardrobeModal } from './wardrobeModal';
-
-function base64ToUint8Array(b64OrDataUrl: string): Uint8Array {
-  const clean = b64OrDataUrl.replace(/^data:image\/png;base64,/, '');
-  const bin = atob(clean);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) {
-    out[i] = bin.charCodeAt(i);
-  }
-  return out;
-}
-
-function uint8ArrayToBase64(bytes: Uint8Array): string {
-  let bin = '';
-  for (let i = 0; i < bytes.length; i++) {
-    bin += String.fromCharCode(bytes[i]);
-  }
-  return btoa(bin);
-}
 
 export class SkinvilApp {
   private readonly i18n = new I18nStore();
@@ -77,6 +60,7 @@ export class SkinvilApp {
   private mannequin!: MannequinWidget;
   private colorPanel!: ColorWorkshopPanel;
   private wardrobeModal!: WardrobeModal;
+  private dragDrop!: DragDropZone;
   private lastHover: HoverInfo | null = null;
 
   // UI element references
@@ -142,9 +126,6 @@ export class SkinvilApp {
   private statusTextEl!: HTMLElement;
   private hintPillEl!: HTMLElement;
   private toastEl!: HTMLElement;
-  private dropOverlayEl!: HTMLElement;
-  private dropOverlayTitleEl!: HTMLElement;
-  private dropOverlaySubEl!: HTMLElement;
 
   constructor(mountEl: HTMLElement) {
     this.paintController = new PaintController(this.engine);
@@ -166,7 +147,15 @@ export class SkinvilApp {
 
     this.buildLayout(mountEl);
     this.bindGlobalShortcuts();
-    this.bindDragAndDrop(mountEl);
+
+    this.dragDrop = new DragDropZone(mountEl, {
+      onHtmlFilesDrop: (files) => {
+        void this.processDroppedOrSelectedFiles(files, this.wardrobeModal.isOpen);
+      },
+      onTauriPathsDrop: (paths) => {
+        void this.handleTauriDrop(paths);
+      },
+    });
 
     this.engine.onChange(() => {
       if (this.engine.undoCount !== this.lastUndoSnapshotCount) {
@@ -185,6 +174,13 @@ export class SkinvilApp {
     this.syncHistoryButtons();
 
     void this.wardrobeModal.reloadEntries();
+
+    window.addEventListener('pagehide', () => this.dispose());
+  }
+
+  /** Releases the 3D renderer, animation loop, and resize observer. */
+  public dispose(): void {
+    this.stage3D?.dispose();
   }
 
   private buildLayout(mountEl: HTMLElement): void {
@@ -727,18 +723,8 @@ export class SkinvilApp {
       onToast: (msg) => this.showToast(msg),
     });
 
-    // --- 5. DRAG & DROP OVERLAY ---
-    this.dropOverlayEl = document.createElement('div');
-    this.dropOverlayEl.className = 'drop-overlay hidden';
-    const dropCard = document.createElement('div');
-    dropCard.className = 'drop-overlay-card';
-    this.dropOverlayTitleEl = document.createElement('h2');
-    this.dropOverlaySubEl = document.createElement('p');
-    dropCard.append(this.dropOverlayTitleEl, this.dropOverlaySubEl);
-    this.dropOverlayEl.appendChild(dropCard);
-
     workspace.append(leftDock, centerArea, this.colorPanel.root);
-    shell.append(header, workspace, this.wardrobeModal.root, this.dropOverlayEl);
+    shell.append(header, workspace, this.wardrobeModal.root);
     mountEl.appendChild(shell);
   }
 
@@ -917,75 +903,25 @@ export class SkinvilApp {
     }
   }
 
-  private bindDragAndDrop(mountEl: HTMLElement): void {
-    let dragDepth = 0;
+  private async handleTauriDrop(pngPaths: string[]): Promise<void> {
+    try {
+      const first = await this.backend.importFromPath(pngPaths[0]);
+      await this.applyImportedSkinToEditor(first.result, first.suggestedName);
 
-    mountEl.addEventListener('dragenter', (e) => {
-      e.preventDefault();
-      dragDepth++;
-      this.dropOverlayEl.classList.remove('hidden');
-    });
-
-    mountEl.addEventListener('dragover', (e) => {
-      e.preventDefault();
-    });
-
-    mountEl.addEventListener('dragleave', () => {
-      dragDepth = Math.max(0, dragDepth - 1);
-      if (dragDepth === 0) {
-        this.dropOverlayEl.classList.add('hidden');
+      if (pngPaths.length > 1 || this.wardrobeModal.isOpen) {
+        for (const p of pngPaths) {
+          const imp = await this.backend.importFromPath(p);
+          const saved = await this.backend.saveToWardrobe({
+            name: imp.suggestedName,
+            geometry: imp.result.detectedGeometry,
+            pngBytes: base64ToUint8Array(imp.result.pngBase64),
+          });
+          this.wardrobeModal.addSelectedId(saved.id);
+        }
+        await this.wardrobeModal.reloadEntries();
       }
-    });
-
-    mountEl.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dragDepth = 0;
-      this.dropOverlayEl.classList.add('hidden');
-      const files = Array.from(e.dataTransfer?.files ?? []);
-      if (files.length > 0) {
-        void this.processDroppedOrSelectedFiles(files, this.wardrobeModal.isOpen);
-      }
-    });
-
-    // Tauri v2 native OS file-path drag-and-drop listener
-    if (isTauriDesktop()) {
-      void getCurrentWebview()
-        .onDragDropEvent(async (event) => {
-          if (event.payload.type === 'enter' || event.payload.type === 'over') {
-            this.dropOverlayEl.classList.remove('hidden');
-          } else if (event.payload.type === 'leave') {
-            this.dropOverlayEl.classList.add('hidden');
-          } else if (event.payload.type === 'drop') {
-            this.dropOverlayEl.classList.add('hidden');
-            const pngPaths = event.payload.paths.filter((p) =>
-              p.toLowerCase().endsWith('.png')
-            );
-            if (pngPaths.length === 0) return;
-
-            try {
-              const first = await this.backend.importFromPath(pngPaths[0]);
-              await this.applyImportedSkinToEditor(first.result, first.suggestedName);
-
-              if (pngPaths.length > 1 || this.wardrobeModal.isOpen) {
-                for (const p of pngPaths) {
-                  const imp = await this.backend.importFromPath(p);
-                  const saved = await this.backend.saveToWardrobe({
-                    name: imp.suggestedName,
-                    geometry: imp.result.detectedGeometry,
-                    pngBytes: base64ToUint8Array(imp.result.pngBase64),
-                  });
-                  this.wardrobeModal.addSelectedId(saved.id);
-                }
-                await this.wardrobeModal.reloadEntries();
-              }
-            } catch (err) {
-              this.showToast(String(err));
-            }
-          }
-        })
-        .catch(() => {
-          // Ignore if running outside native webview window
-        });
+    } catch (err) {
+      this.showToast(String(err));
     }
   }
 
@@ -1179,8 +1115,7 @@ export class SkinvilApp {
     this.poseBtns.spread.textContent = t.poseSpread;
     this.poseBtns.spread.title = t.poseSpreadTooltip;
 
-    this.dropOverlayTitleEl.textContent = t.dropOverlayTitle;
-    this.dropOverlaySubEl.textContent = t.dropOverlaySub;
+    this.dragDrop.setLabels(t.dropOverlayTitle, t.dropOverlaySub);
 
     this.refreshHintLine();
     this.renderHoverStatus();
