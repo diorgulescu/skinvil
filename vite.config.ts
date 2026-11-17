@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-only
 import { defineConfig } from 'vite';
 
 const host = process.env.TAURI_DEV_HOST;

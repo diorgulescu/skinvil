@@ -5,7 +5,7 @@ import type {
   WardrobeEntry,
 } from '../core/wardrobeClient';
 import type { I18nStore } from '../i18n/translations';
-import { ICONS } from './icons';
+import { APP_ICON_URL, ICONS } from './icons';
 
 export interface WardrobeModalCallbacks {
   onLoadEntryIntoEditor: (entry: WardrobeEntry) => Promise<void>;
@@ -82,19 +82,29 @@ export class WardrobeModal {
     const header = document.createElement('div');
     header.className = 'wardrobe-header';
 
+    const headerIdentity = document.createElement('div');
+    headerIdentity.className = 'wardrobe-header-identity';
+
+    const headerLogo = document.createElement('img');
+    headerLogo.className = 'wardrobe-brand-logo';
+    headerLogo.src = APP_ICON_URL;
+    headerLogo.alt = 'Skinvil';
+    headerLogo.draggable = false;
+
     const titleWrap = document.createElement('div');
     this.modalTitleEl = document.createElement('h2');
     this.modalTitleEl.className = 'wardrobe-title';
     this.modalSubEl = document.createElement('p');
     this.modalSubEl.className = 'wardrobe-subtitle';
     titleWrap.append(this.modalTitleEl, this.modalSubEl);
+    headerIdentity.append(headerLogo, titleWrap);
 
     this.closeBtn = document.createElement('button');
     this.closeBtn.type = 'button';
     this.closeBtn.className = 'block-btn';
     this.closeBtn.addEventListener('click', () => this.close());
 
-    header.append(titleWrap, this.closeBtn);
+    header.append(headerIdentity, this.closeBtn);
 
     // Top Action Bar
     const actionBar = document.createElement('div');

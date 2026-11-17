@@ -1,5 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Skinvil — 100% Offline 3D Voxel Character Skin Creator & .mcpack Studio
+// Copyright (C) 2026 Skinvil Contributors
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of version 3 of the GNU General Public License as
+// published by the Free Software Foundation.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program (see LICENSE). If not, see <https://www.gnu.org/licenses/>.
 
 pub mod mcpack;
 pub mod skin_io;

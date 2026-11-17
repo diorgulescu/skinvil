@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import { getCurrentWebview } from '@tauri-apps/api/webview';
 import { isTauriDesktop } from '../core/wardrobeClient';
+import { APP_ICON_URL } from './icons';
 
 export interface DragDropCallbacks {
   /** Called with HTML5 File objects dropped onto the window (browser/web fallback). */
@@ -28,9 +29,14 @@ export class DragDropZone {
 
     const card = document.createElement('div');
     card.className = 'drop-overlay-card';
+    const logo = document.createElement('img');
+    logo.className = 'drop-overlay-logo';
+    logo.src = APP_ICON_URL;
+    logo.alt = 'Skinvil';
+    logo.draggable = false;
     this.titleEl = document.createElement('h2');
     this.subEl = document.createElement('p');
-    card.append(this.titleEl, this.subEl);
+    card.append(logo, this.titleEl, this.subEl);
     this.overlayEl.appendChild(card);
     mountEl.appendChild(this.overlayEl);
 

@@ -123,10 +123,6 @@ export interface TranslationStrings {
   allOff: string;
 
   // 3D Viewport Controls & Poses
-  modePaint: string;
-  modePaintTooltip: string;
-  modeRotate: string;
-  modeRotateTooltip: string;
   resetViewBtn: string;
   resetViewTooltip: string;
 
@@ -138,9 +134,10 @@ export interface TranslationStrings {
   poseActionTooltip: string;
   poseSpread: string;
   poseSpreadTooltip: string;
+  posePauseTooltip: string;
+  posePlayTooltip: string;
 
-  viewportHintPaint: string;
-  viewportHintRotate: string;
+  viewportHint: string;
   statusReady: string;
 
   // 2D Editor Panel
@@ -159,6 +156,14 @@ export interface TranslationStrings {
   parts: Record<PartId, string>;
   faces: Record<FaceName, string>;
   layers: { base: string; outer: string };
+
+  // About & GNU GPLv3 Legal Notices (Section 0 & 5d)
+  aboutLicenseBtn: string;
+  aboutLicenseTooltip: string;
+  aboutModalTitle: string;
+  aboutFreeSoftwareNotice: string;
+  aboutNoWarrantyNotice: string;
+  aboutMinecraftDisclaimer: string;
 }
 
 export const TRANSLATIONS: Record<Locale, TranslationStrings> = {
@@ -287,24 +292,22 @@ export const TRANSLATIONS: Record<Locale, TranslationStrings> = {
     allOn: 'Tot',
     allOff: 'Nimic',
 
-    modePaint: 'Mod Pictură',
-    modePaintTooltip: 'Clic-stânga pe personaj pictează! (Clic-dreapta sau fundalul rotește camera)',
-    modeRotate: 'Rotire Cameră',
-    modeRotateTooltip: 'Perfect pentru touchpad! Clic-stânga oriunde rotește personajul fără să picteze',
     resetViewBtn: 'Centrare',
     resetViewTooltip: 'Adu camera înapoi în fața personajului',
 
     poseStand: 'Stând',
-    poseStandTooltip: 'Poziție dreaptă clasică',
+    poseStandTooltip: 'Poziție dreaptă cu respirație ușoară animată',
     poseWalk: 'Mers',
-    poseWalkTooltip: 'Poziție în pas de mers',
+    poseWalkTooltip: 'Mers voxel animat în timp real (îngheață automat cât timp pictezi!)',
     poseAction: 'Acțiune',
-    poseActionTooltip: 'Poziție eroică de aventură',
+    poseActionTooltip: 'Alergare eroică dinamică (sau postură eroică fixă când pui pauză)',
     poseSpread: 'Desfăcut (T)',
-    poseSpreadTooltip: 'Depărtează brațele și picioarele ca să pictezi ușor părțile interioare!',
+    poseSpreadTooltip: 'Postură T complet nemișcată — ideală pentru pictat părțile interioare!',
+    posePauseTooltip: 'Îngheață mișcarea',
+    posePlayTooltip: 'Pornește mișcarea',
 
-    viewportHintPaint: 'Clic-stânga: Pictează  •  Trage un .PNG pe fereastră ca să-l imporți!',
-    viewportHintRotate: 'Mod Touchpad Activ: Trage cu clic-stânga ca să rotești personajul 3D!',
+    viewportHint:
+      'Clic-stânga pe model: Pictează (pe fundal: Rotește)  •  Clic-dreapta: Rotește  •  Rotiță: Zoom',
     statusReady: 'Pregătit de pictat! Plimbă mouse-ul peste personaj.',
 
     editor2DTitle: 'Harta Plată 2D (64×64)',
@@ -349,6 +352,16 @@ export const TRANSLATIONS: Record<Locale, TranslationStrings> = {
       base: 'Bază',
       outer: 'Exterior',
     },
+
+    aboutLicenseBtn: 'GPLv3',
+    aboutLicenseTooltip: 'Despre Skinvil, drepturi de autor și licența liberă GNU GPLv3',
+    aboutModalTitle: 'Despre Skinvil & Licența Liberă GNU GPLv3',
+    aboutFreeSoftwareNotice:
+      'Skinvil este software liber (free software): îl poți redistribui și/sau modifica în termenii Licenței Publice Generale GNU versiunea 3 (GNU GPLv3, SPDX: GPL-3.0-only), publicată de Free Software Foundation.',
+    aboutNoWarrantyNotice:
+      'FĂRĂ GARANȚIE: Acest program este distribuit în speranța că va fi util, dar FĂRĂ NICIO GARANȚIE; fără măcar garanția implicită de VANDABILITATE sau POTRIVIRE PENTRU UN ANUMIT SCOP (vezi Secțiunile 15 și 16 din licența completă de mai jos).',
+    aboutMinecraftDisclaimer:
+      'NU ESTE UN PRODUS OFICIAL MINECRAFT. NU ESTE APROBAT DE ȘI NU ESTE ASOCIAT CU MOJANG SAU MICROSOFT.',
   },
 
   en: {
@@ -476,24 +489,22 @@ export const TRANSLATIONS: Record<Locale, TranslationStrings> = {
     allOn: 'All',
     allOff: 'None',
 
-    modePaint: 'Paint Mode',
-    modePaintTooltip: 'Left-click on character paints! (Right-click or drag sky to orbit camera)',
-    modeRotate: 'Rotate Camera',
-    modeRotateTooltip: 'Trackpad friendly! Left-drag anywhere rotates the 3D view without painting',
     resetViewBtn: 'Reset View',
     resetViewTooltip: 'Reset camera back to the front hero view',
 
     poseStand: 'Stand',
-    poseStandTooltip: 'Neutral standing pose',
+    poseStandTooltip: 'Gentle animated idle breathing pose',
     poseWalk: 'Walk',
-    poseWalkTooltip: 'Mid-stride walking pose',
+    poseWalkTooltip: 'Real-time animated voxel walk cycle (auto-freezes while painting!)',
     poseAction: 'Action',
-    poseActionTooltip: 'Heroic adventure pose',
+    poseActionTooltip: 'Dynamic hero sprint cycle (or static heroic strike when paused)',
     poseSpread: 'Spread / T-Pose',
-    poseSpreadTooltip: 'Separates arms, legs, and head so inner surfaces are easy to paint!',
+    poseSpreadTooltip: 'Strictly static T-Pose — keeps inner limb faces still for precision painting!',
+    posePauseTooltip: 'Freeze motion',
+    posePlayTooltip: 'Start motion',
 
-    viewportHintPaint: 'Left-drag: Paint  •  Drag & drop any .PNG file to import!',
-    viewportHintRotate: 'Rotate Mode Active: Left-drag anywhere to orbit the 3D character!',
+    viewportHint:
+      'Left-drag model: Paint (background: Orbit)  •  Right-drag: Orbit  •  Scroll: Zoom',
     statusReady: 'Ready to paint! Hover over the character.',
 
     editor2DTitle: '2D Flat Texture (64×64)',
@@ -538,6 +549,16 @@ export const TRANSLATIONS: Record<Locale, TranslationStrings> = {
       base: 'Base',
       outer: 'Outer',
     },
+
+    aboutLicenseBtn: 'GPLv3',
+    aboutLicenseTooltip: 'About Skinvil, copyright notice, and GNU GPLv3 free software license',
+    aboutModalTitle: 'About Skinvil & GNU GPLv3 License',
+    aboutFreeSoftwareNotice:
+      'Skinvil is free software: you can redistribute it and/or modify it under the terms of version 3 of the GNU General Public License (GNU GPLv3, SPDX: GPL-3.0-only) as published by the Free Software Foundation.',
+    aboutNoWarrantyNotice:
+      'NO WARRANTY: This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE (see Sections 15 & 16 in the full license text below).',
+    aboutMinecraftDisclaimer:
+      'NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
   },
 };
 
