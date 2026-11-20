@@ -401,8 +401,9 @@
                 <h3>Windows</h3>
                 <p class="os-formats">Windows 10 / 11 (x64) • .msi &amp; -setup.exe</p>
                 <p data-i18n="dlWinDesc">
-                  Native Windows installer using WebView2. Double-click exported .mcpack files to
-                  import straight into Minecraft for Windows (Bedrock).
+                  Native Windows installer using WebView2, code-signed via SignPath Foundation.
+                  Double-click exported .mcpack files to import straight into Minecraft for Windows
+                  (Bedrock).
                 </p>
               </div>
               <a
@@ -449,6 +450,27 @@
                 Download for Linux
               </a>
             </div>
+          </div>
+
+          <div id="code-signing-policy" class="signing-policy-box">
+            <h3 data-i18n="signTitle">Code Signing &amp; Privacy Policy</h3>
+            <p data-i18n-html="signCredit">
+              Free code signing provided by
+              <a href="https://signpath.io/" target="_blank" rel="noopener noreferrer">SignPath.io</a>,
+              certificate by
+              <a href="https://signpath.org/" target="_blank" rel="noopener noreferrer">SignPath Foundation</a>.
+            </p>
+            <p data-i18n-html="signRoles">
+              <strong>Committers, Reviewers &amp; Approvers:</strong> Project maintainer
+              <a href="https://github.com/diorgulescu" target="_blank" rel="noopener noreferrer">@diorgulescu</a>
+              and
+              <a href="https://github.com/diorgulescu/skinvil/graphs/contributors" target="_blank" rel="noopener noreferrer">Skinvil Contributors</a>.
+            </p>
+            <p data-i18n="signPrivacy">
+              Privacy Policy: This program will not transfer any information to other networked
+              systems unless specifically requested by the user or the person installing or
+              operating it. Skinvil operates 100% offline with zero telemetry.
+            </p>
           </div>
 
           <div class="source-build-box">
@@ -649,7 +671,7 @@ npm run tauri build</code></pre>
             dlSubtitle:
               'All official installers are built transparently from public source code via GitHub Actions and provided free of charge.',
             dlWinDesc:
-              'Native Windows installer using WebView2. Double-click exported .mcpack files to import straight into Minecraft for Windows (Bedrock).',
+              'Native Windows installer using WebView2, code-signed via SignPath Foundation. Double-click exported .mcpack files to import straight into Minecraft for Windows (Bedrock).',
             dlWinBtn: 'Download for Windows',
             dlMacDesc:
               'Runs natively on M-series Apple Silicon and Intel Macs. Export Java .png skins or AirDrop .mcpack packs directly to iPad / iPhone!',
@@ -657,6 +679,13 @@ npm run tauri build</code></pre>
             dlLinDesc:
               'Portable AppImage plus native Debian/Ubuntu and Fedora/RHEL packages powered by WebKitGTK 4.1 and Rust.',
             dlLinBtn: 'Download for Linux',
+            signTitle: 'Code Signing & Privacy Policy',
+            signCredit:
+              'Free code signing provided by <a href="https://signpath.io/" target="_blank" rel="noopener noreferrer">SignPath.io</a>, certificate by <a href="https://signpath.org/" target="_blank" rel="noopener noreferrer">SignPath Foundation</a>.',
+            signRoles:
+              '<strong>Committers, Reviewers &amp; Approvers:</strong> Project maintainer <a href="https://github.com/diorgulescu" target="_blank" rel="noopener noreferrer">@diorgulescu</a> and <a href="https://github.com/diorgulescu/skinvil/graphs/contributors" target="_blank" rel="noopener noreferrer">Skinvil Contributors</a>.',
+            signPrivacy:
+              'Privacy Policy: This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. Skinvil operates 100% offline with zero telemetry.',
             buildTitle: 'Build & Verify from Source',
             buildDesc:
               'Requires Node.js 22.12+ and Rust stable (1.77.2+). Clone the repository, run the automated frontend and Rust test suites, and compile your own native installer:',
@@ -755,7 +784,7 @@ npm run tauri build</code></pre>
             dlSubtitle:
               'Toate pachetele oficiale sunt compilate transparent din codul sursă public prin GitHub Actions și oferite complet gratuit.',
             dlWinDesc:
-              'Instalator nativ Windows cu WebView2. Dublu-clic pe fișierul .mcpack exportat îl importă direct în Minecraft for Windows (Bedrock).',
+              'Instalator nativ Windows cu WebView2, semnat digital prin SignPath Foundation. Dublu-clic pe fișierul .mcpack exportat îl importă direct în Minecraft for Windows (Bedrock).',
             dlWinBtn: 'Descarcă pentru Windows',
             dlMacDesc:
               'Rulează nativ pe Apple Silicon (seria M) și Intel. Exportă .png pentru Java sau trimite .mcpack prin AirDrop pe iPad / iPhone!',
@@ -763,6 +792,13 @@ npm run tauri build</code></pre>
             dlLinDesc:
               'AppImage portabil plus pachete native Debian/Ubuntu și Fedora/RHEL bazate pe WebKitGTK 4.1 și Rust.',
             dlLinBtn: 'Descarcă pentru Linux',
+            signTitle: 'Politica de Semnare Digitală & Confidențialitate',
+            signCredit:
+              'Semnare digitală gratuită a codului oferită de <a href="https://signpath.io/" target="_blank" rel="noopener noreferrer">SignPath.io</a>, certificat emis de <a href="https://signpath.org/" target="_blank" rel="noopener noreferrer">SignPath Foundation</a>.',
+            signRoles:
+              '<strong>Contribuitori, Verificatori &amp; Aprobatori:</strong> Coordonatorul proiectului <a href="https://github.com/diorgulescu" target="_blank" rel="noopener noreferrer">@diorgulescu</a> și <a href="https://github.com/diorgulescu/skinvil/graphs/contributors" target="_blank" rel="noopener noreferrer">Contribuitorii Skinvil</a>.',
+            signPrivacy:
+              'Politica de confidențialitate: Acest program nu transmite nicio informație către alte sisteme din rețea decât dacă utilizatorul solicită explicit acest lucru. Skinvil funcționează 100% offline, cu zero telemetrie.',
             buildTitle: 'Compilează și Verifică din Codul Sursă',
             buildDesc:
               'Necesită Node.js 22.12+ și Rust stabil (1.77.2+). Clonează depozitul, rulează testele automate și construiește propriul instalator nativ:',

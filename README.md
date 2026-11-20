@@ -73,7 +73,7 @@ Because **Skinvil** is free, community-built open-source software distributed wi
 
 ### Windows (`.msi` / `-setup.exe`)
 1. Double-click the installer.
-2. If **Windows Defender SmartScreen** displays *"Windows protected your PC"*, click **More info** and then click **Run anyway**.
+2. Free code signing on Windows is provided by [SignPath.io](https://signpath.io/), certificate by [SignPath Foundation](https://signpath.org/) *(on unsigned preview builds, if **Windows Defender SmartScreen** displays "Windows protected your PC", click **More info → Run anyway**)*.
 
 ### Linux (`.AppImage` / `.deb`)
 - **AppImage**:

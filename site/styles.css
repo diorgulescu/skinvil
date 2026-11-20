@@ -676,6 +676,34 @@ pre {
   color: var(--text-muted);
 }
 
+.signing-policy-box {
+  background: rgba(31, 39, 61, 0.9);
+  border: 2px solid rgba(52, 211, 153, 0.45);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 0 var(--border-dark);
+}
+
+.signing-policy-box h3 {
+  margin: 0 0 8px;
+  font-size: 1.12rem;
+  font-weight: 900;
+  color: var(--accent-emerald);
+}
+
+.signing-policy-box p {
+  margin: 0 0 8px;
+  font-size: 0.93rem;
+  color: var(--text-body);
+}
+
+.signing-policy-box p:last-child {
+  margin-bottom: 0;
+  color: var(--text-muted);
+  font-size: 0.89rem;
+}
+
 .source-build-box {
   background: #141a2a;
   border: 2px solid var(--border-subtle);
