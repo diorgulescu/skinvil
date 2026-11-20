@@ -10,6 +10,9 @@
 
 Designed for ages 6–12 with an instant **Romanian (`RO`) / English (`EN`)** bilingual interface, **Skinvil** makes zero network requests, loads zero external CDN assets, and collects zero telemetry.
 
+- **Official Project Homepage:** [https://diorgulescu.github.io/skinvil/](https://diorgulescu.github.io/skinvil/)
+- **Latest Desktop Downloads:** [GitHub Releases](https://github.com/diorgulescu/skinvil/releases)
+
 ---
 
 ## Features
@@ -100,6 +103,7 @@ Because **Skinvil** is free, community-built open-source software distributed wi
 skinvil/
 ├── app-icon.svg                 # Canonical SVG brand mark used across UI, favicon, and docs
 ├── LICENSE                      # Full verbatim GNU General Public License v3.0
+├── site/                        # Static EN/RO project homepage & screenshots deployed to GitHub Pages
 ├── index.html                   # Offline entry HTML
 ├── src/
 │   ├── core/                    # 64×64 RGBA engine, Minecraft UV spec, paint tools, palettes, templates, IPC bridge
@@ -150,9 +154,9 @@ npm run tauri build
 
 ---
 
-## GitHub Actions CI & Cross-Platform Binary Builds
+## GitHub Actions CI, Releases & GitHub Pages
 
-This repository includes two GitHub Actions workflows under `.github/workflows/`:
+This repository includes three GitHub Actions workflows under `.github/workflows/`:
 
 1. **Continuous Binary Builds ([`.github/workflows/build.yml`](./.github/workflows/build.yml))**
    - Runs automatically on pushes to `main` / `master`, pull requests, or manually via **Actions → Run workflow**.
@@ -167,6 +171,8 @@ This repository includes two GitHub Actions workflows under `.github/workflows/`
      git push origin v0.1.0
      ```
    - Publishes a GitHub Release with native installers attached for **macOS** (Universal & Apple Silicon `.dmg`), **Windows** (`.msi` & `-setup.exe`), and **Linux** (`.AppImage`, `.deb`, `.rpm`).
+3. **GitHub Pages Homepage Deployment ([`.github/workflows/pages.yml`](./.github/workflows/pages.yml))**
+   - Automatically publishes `./site` (project overview, bilingual `EN | RO` toggle, and studio screenshots) to `https://diorgulescu.github.io/skinvil/` on pushes to `main` (enable **Settings → Pages → Build and deployment → Source: GitHub Actions** once in the GitHub repository settings).
 
 ---
 

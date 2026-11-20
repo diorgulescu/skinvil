@@ -1,0 +1,835 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Copyright (C) 2026 Skinvil Contributors — Licensed under the GNU General Public License v3.0 (GPL-3.0-only) -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skinvil — 100% Offline 3D Voxel Skin Creator &amp; .mcpack Studio</title>
+    <meta
+      name="description"
+      content="Skinvil is a free, open-source (GNU GPLv3), kid-friendly, 100% offline 3D voxel character skin creator and Minecraft Bedrock .mcpack / Java .png studio for Windows, macOS, and Linux."
+    />
+    <meta property="og:title" content="Skinvil — 3D Voxel Skin Creator &amp; .mcpack Studio" />
+    <meta
+      property="og:description"
+      content="Free &amp; open-source (GPLv3), kid-friendly, 100% offline desktop 3D voxel skin studio for Windows, macOS, and Linux."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://diorgulescu.github.io/skinvil/" />
+    <meta
+      property="og:image"
+      content="https://diorgulescu.github.io/skinvil/screenshots/studio-3d.png"
+    />
+    <link rel="icon" type="image/svg+xml" href="./app-icon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="top-disclaimer" data-i18n="topDisclaimer">
+      NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
+    </div>
+
+    <header class="site-header">
+      <div class="container nav-inner">
+        <a class="brand-link" href="#">
+          <img class="brand-icon" src="./app-icon.svg" width="42" height="42" alt="Skinvil Logo" />
+          <span class="brand-wordmark">
+            <span class="brand-title">SKINVIL</span>
+            <span class="brand-sub" data-i18n="brandSub">3D Voxel Character Skin Forge</span>
+          </span>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#screenshots" data-i18n="navScreenshots">Screenshots</a>
+          <a href="#features" data-i18n="navFeatures">Features</a>
+          <a href="#downloads" data-i18n="navDownloads">Downloads</a>
+          <a href="#open-source" data-i18n="navOpenSource">Open Source</a>
+        </nav>
+
+        <div class="nav-actions">
+          <div class="lang-pill" role="group" aria-label="Language Switcher">
+            <button type="button" class="lang-btn active" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="ro">RO</button>
+          </div>
+          <a
+            class="voxel-btn voxel-btn-sm btn-panel"
+            href="https://github.com/diorgulescu/skinvil"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- ================= HERO ================= -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-inner">
+            <div class="hero-logo-wrap">
+              <img
+                class="hero-logo"
+                src="./app-icon.svg"
+                width="84"
+                height="84"
+                alt="Skinvil Voxel Anvil Emblem"
+              />
+            </div>
+
+            <div class="badge-row">
+              <span class="pill-badge emerald" data-i18n="badgeOffline">
+                100% Offline • Zero Telemetry
+              </span>
+              <span class="pill-badge cyan" data-i18n="badgeKids">
+                Kid-Friendly (Ages 6–12) • EN / RO
+              </span>
+              <span class="pill-badge amber" data-i18n="badgeGpl">
+                Free &amp; Open Source (GNU GPLv3)
+              </span>
+            </div>
+
+            <h1 data-i18n-html="heroTitle">
+              Craft 3D Voxel Skins &amp; Forge
+              <span class="highlight">Ready-to-Play .mcpack</span> Packs
+            </h1>
+
+            <p class="hero-lead" data-i18n="heroLead">
+              Skinvil is a fast, native desktop studio built with Tauri v2 (Rust), TypeScript, and
+              Three.js. Paint directly on animated 3D characters, toggle armor layers, manage a
+              local Wardrobe, and export multi-skin Minecraft Bedrock .mcpack archives or Java .png
+              textures — completely offline, with zero accounts, zero ads, and zero network calls.
+            </p>
+
+            <div class="hero-cta-row">
+              <a
+                class="voxel-btn btn-amber"
+                href="https://github.com/diorgulescu/skinvil/releases/latest"
+                data-i18n="ctaDownload"
+              >
+                Download Free Installers
+              </a>
+              <a class="voxel-btn btn-cyan" href="#screenshots" data-i18n="ctaTour">
+                View Screenshots (3)
+              </a>
+              <a
+                class="voxel-btn btn-panel"
+                href="https://github.com/diorgulescu/skinvil"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-i18n="ctaSource"
+              >
+                Browse Source Code
+              </a>
+            </div>
+
+            <p class="hero-os-note" data-i18n="heroOsNote">
+              Native installers for Windows (x64 .msi / .exe), macOS (Universal &amp; Apple Silicon
+              .dmg), and Linux (.AppImage / .deb / .rpm)
+            </p>
+          </div>
+
+          <div class="hero-preview-wrap">
+            <div class="window-chrome">
+              <div class="window-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="window-title">Skinvil v0.1.0 — 3D Voxel Character Skin Forge</span>
+              <span aria-hidden="true"></span>
+            </div>
+            <button
+              type="button"
+              class="hero-preview-btn js-zoom"
+              data-src="./screenshots/studio-3d.png"
+              data-caption="Skinvil 3D Voxel Studio &amp; Synced 64×64 2D Flat Texture Editor"
+              aria-label="Enlarge Skinvil studio preview"
+            >
+              <img
+                src="./screenshots/studio-3d.png"
+                width="1400"
+                height="880"
+                alt="Skinvil 3D Voxel Studio showing Royal Knight on the 3D stage beside the live-synced 64x64 2D UV texture grid and Color Workshop"
+              />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SCREENSHOTS TOUR ================= -->
+      <section id="screenshots" class="section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-eyebrow" data-i18n="shotsEyebrow">Inside the Studio</span>
+            <h2 data-i18n="shotsTitle">Three Views of the Skinvil Workflow</h2>
+            <p data-i18n="shotsSubtitle">
+              Click any screenshot to inspect it at full desktop resolution.
+            </p>
+          </div>
+
+          <div class="screenshots-stack">
+            <!-- Screenshot 1 -->
+            <article class="shot-card">
+              <div class="shot-media">
+                <button
+                  type="button"
+                  class="shot-zoom-trigger js-zoom"
+                  data-src="./screenshots/studio-3d.png"
+                  data-caption="1. Live-Synced 3D Character Stage &amp; 64×64 2D UV Texture Grid"
+                >
+                  <img
+                    src="./screenshots/studio-3d.png"
+                    width="1400"
+                    height="880"
+                    loading="lazy"
+                    alt="Skinvil 3D stage paired with the 64x64 2D UV texture grid, mini-mannequin part toggles, and HSV Color Workshop"
+                  />
+                  <span class="zoom-pill" data-i18n="zoomLabel">Click to enlarge</span>
+                </button>
+              </div>
+              <div class="shot-copy">
+                <span class="shot-step" data-i18n="shot1Badge">01 • 3D + 2D Studio</span>
+                <h3 data-i18n="shot1Title">
+                  Zero-Mode-Switching 3D Viewport &amp; Synced 64×64 UV Grid
+                </h3>
+                <p data-i18n="shot1Desc">
+                  Paint directly onto the 3D voxel model or refine individual texels on the synced
+                  2D UV map — every stroke updates a single 64×64 RGBA canvas with 50-step
+                  Undo/Redo.
+                </p>
+                <ul class="shot-bullets">
+                  <li data-i18n-html="shot1Bullet1">
+                    <strong>Effortless Desktop Mouse Controls:</strong> Left-click on the character
+                    paints immediately; dragging empty space or right-dragging anywhere orbits the
+                    camera.
+                  </li>
+                  <li data-i18n-html="shot1Bullet2">
+                    <strong>12-Part Interactive Mini-Mannequin:</strong> Hide or solo any of the 6
+                    Base parts or 6 Outer armor pieces to paint inner limb surfaces cleanly.
+                  </li>
+                  <li data-i18n-html="shot1Bullet3">
+                    <strong>Color Workshop &amp; Kid Palettes:</strong> Smooth HSV picker, 12 recent
+                    swatches, and 4 curated palettes (Skin Tones, Knights, Hoodies, Nature).
+                  </li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Screenshot 2 -->
+            <article class="shot-card">
+              <div class="shot-media">
+                <button
+                  type="button"
+                  class="shot-zoom-trigger js-zoom"
+                  data-src="./screenshots/wardrobe-mcpack.png"
+                  data-caption="2. Local Wardrobe &amp; Multi-Skin Minecraft Bedrock .mcpack Forge"
+                >
+                  <img
+                    src="./screenshots/wardrobe-mcpack.png"
+                    width="1480"
+                    height="920"
+                    loading="lazy"
+                    alt="Skinvil Local Wardrobe modal with 4 selected characters (Cyber Robot, Space Astronaut, Slim Adventurer, Royal Knight) ready to forge a .mcpack"
+                  />
+                  <span class="zoom-pill" data-i18n="zoomLabel">Click to enlarge</span>
+                </button>
+              </div>
+              <div class="shot-copy">
+                <span class="shot-step" data-i18n="shot2Badge">02 • Wardrobe &amp; .mcpack</span>
+                <h3 data-i18n="shot2Title">
+                  Local Character Wardrobe &amp; 1-Click Bedrock .mcpack Forge
+                </h3>
+                <p data-i18n="shot2Desc">
+                  Save all your creations locally with auto-rendered 2D portraits, mix Classic
+                  (Steve 4px) and Slim (Alex 3px) geometries, and bundle multiple characters into
+                  one ready-to-install skin pack.
+                </p>
+                <ul class="shot-bullets">
+                  <li data-i18n-html="shot2Bullet1">
+                    <strong>Bedrock .mcpack Packager:</strong> Rust generates compliant ZIP-root
+                    <code>manifest.json</code>, <code>skins.json</code>, UUIDv4 headers, and
+                    <code>texts/en_US.lang</code> files in milliseconds.
+                  </li>
+                  <li data-i18n-html="shot2Bullet2">
+                    <strong>Java Edition .PNG Export:</strong> Export clean individual
+                    <code>.png</code> skin files ready for Minecraft Launcher.
+                  </li>
+                  <li data-i18n-html="shot2Bullet3">
+                    <strong>6 Offline Templates &amp; Smart Import:</strong> Auto-converts legacy
+                    <code>64×32</code> skins to <code>64×64</code> and preserves
+                    <code>128×128</code> HD textures.
+                  </li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Screenshot 3 -->
+            <article class="shot-card">
+              <div class="shot-media">
+                <button
+                  type="button"
+                  class="shot-zoom-trigger js-zoom"
+                  data-src="./screenshots/poses-outer-ro.png"
+                  data-caption="3. Real-Time Action Poses, 3D Outer Layer &amp; Bilingual RO / EN Interface"
+                >
+                  <img
+                    src="./screenshots/poses-outer-ro.png"
+                    width="1480"
+                    height="920"
+                    loading="lazy"
+                    alt="Wide 3D stage in Romanian UI showing Space Astronaut sprinting in Action pose with 3D Outer layer and Mirror X enabled"
+                  />
+                  <span class="zoom-pill" data-i18n="zoomLabel">Click to enlarge</span>
+                </button>
+              </div>
+              <div class="shot-copy">
+                <span class="shot-step" data-i18n="shot3Badge">03 • Poses &amp; Bilingual UI</span>
+                <h3 data-i18n="shot3Title">
+                  Animated Poses, 3D Outer Armor Layer &amp; Bilingual RO / EN UI
+                </h3>
+                <p data-i18n="shot3Desc">
+                  Collapse the 2D panel for a wide 3D stage, paint 3D helmets, visors, sleeves, and
+                  jackets on the Outer layer, and preview your character in motion.
+                </p>
+                <ul class="shot-bullets">
+                  <li data-i18n-html="shot3Bullet1">
+                    <strong>Kid-Friendly Auto-Freeze:</strong> Stand, Walk, and Action poses animate
+                    smoothly in real time and automatically freeze mid-stroke the instant you paint
+                    on a limb.
+                  </li>
+                  <li data-i18n-html="shot3Bullet2">
+                    <strong>Crisp Per-Face UV Shader:</strong> Custom GLSL clamping eliminates MSAA
+                    neighbor-texel bleed on transparent 3D Outer layers.
+                  </li>
+                  <li data-i18n-html="shot3Bullet3">
+                    <strong>Instant RO | EN Switch:</strong> Built for children ages 6–12 with
+                    complete Romanian and English localization and an offline GPLv3 viewer.
+                  </li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FEATURES GRID ================= -->
+      <section id="features" class="section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-eyebrow" data-i18n="featEyebrow">Engineered for Simplicity</span>
+            <h2 data-i18n="featTitle">Everything Young Creators Need — Nothing They Don't</h2>
+            <p data-i18n="featSubtitle">
+              Fast Rust + WebGL performance wrapped in chunky, high-contrast voxel controls.
+            </p>
+          </div>
+
+          <div class="features-grid">
+            <div class="feature-card">
+              <span class="feature-icon" aria-hidden="true">🎨</span>
+              <h3 data-i18n="f1Title">Voxel Paint Power-Ups</h3>
+              <p data-i18n="f1Desc">
+                1px Pencil, smart Eraser (skin-tone fill on Base or transparent clear on Outer),
+                UV-face-bounded Bucket Fill, Eyedropper, Mirror X symmetry, and ±6% Auto-Noise
+                texturing.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <span class="feature-icon" aria-hidden="true">🏃</span>
+              <h3 data-i18n="f2Title">Anatomical Joint Poses</h3>
+              <p data-i18n="f2Desc">
+                Base and Outer meshes share anatomical shoulder, neck, and hip pivots across Stand,
+                Walk, Action sprint, and static T-Pose — with manual Play/Pause and automatic brush
+                freeze.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <span class="feature-icon" aria-hidden="true">🛡️</span>
+              <h3 data-i18n="f3Title">Classic &amp; Slim Geometry</h3>
+              <p data-i18n="f3Desc">
+                Switch live between Classic "Steve" (4px arms) and Slim "Alex" (3px arms), or let
+                Skinvil auto-detect geometry on imported PNGs by inspecting pixel (54, 20) alpha.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <span class="feature-icon" aria-hidden="true">📦</span>
+              <h3 data-i18n="f4Title">Legacy &amp; HD Skin Support</h3>
+              <p data-i18n="f4Desc">
+                Drag and drop any Minecraft skin PNG: Rust validates dimensions, upgrades legacy
+                64×32 skins into modern 64×64 layout, and preserves unmodified 128×128 HD skins.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <span class="feature-icon" aria-hidden="true">🔒</span>
+              <h3 data-i18n="f5Title">100% Offline &amp; Kid-Safe</h3>
+              <p data-i18n="f5Desc">
+                Enforced via Tauri Content Security Policy: zero accounts, zero cloud uploads, zero
+                external CDNs, zero ads, and zero analytics or telemetry.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <span class="feature-icon" aria-hidden="true">⚡</span>
+              <h3 data-i18n="f6Title">Lightweight Native App</h3>
+              <p data-i18n="f6Desc">
+                Powered by Tauri v2 and Rust rather than bundled Chromium — tiny installer footprint,
+                instant cold startup, and local OS AppData Wardrobe storage.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= DOWNLOADS & BUILD ================= -->
+      <section id="downloads" class="section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-eyebrow" data-i18n="dlEyebrow">Get Skinvil</span>
+            <h2 data-i18n="dlTitle">Free Desktop Downloads &amp; Source Builds</h2>
+            <p data-i18n="dlSubtitle">
+              All official installers are built transparently from public source code via GitHub
+              Actions and provided free of charge.
+            </p>
+          </div>
+
+          <div class="downloads-grid">
+            <div class="os-card">
+              <div>
+                <h3>Windows</h3>
+                <p class="os-formats">Windows 10 / 11 (x64) • .msi &amp; -setup.exe</p>
+                <p data-i18n="dlWinDesc">
+                  Native Windows installer using WebView2. Double-click exported .mcpack files to
+                  import straight into Minecraft for Windows (Bedrock).
+                </p>
+              </div>
+              <a
+                class="voxel-btn btn-amber"
+                href="https://github.com/diorgulescu/skinvil/releases/latest"
+                data-i18n="dlWinBtn"
+              >
+                Download for Windows
+              </a>
+            </div>
+
+            <div class="os-card">
+              <div>
+                <h3>macOS</h3>
+                <p class="os-formats">Universal &amp; Apple Silicon • .dmg</p>
+                <p data-i18n="dlMacDesc">
+                  Runs natively on M-series Apple Silicon and Intel Macs. Export Java .png skins or
+                  AirDrop .mcpack packs directly to iPad / iPhone!
+                </p>
+              </div>
+              <a
+                class="voxel-btn btn-cyan"
+                href="https://github.com/diorgulescu/skinvil/releases/latest"
+                data-i18n="dlMacBtn"
+              >
+                Download for macOS
+              </a>
+            </div>
+
+            <div class="os-card">
+              <div>
+                <h3>Linux</h3>
+                <p class="os-formats">x86_64 • .AppImage, .deb &amp; .rpm</p>
+                <p data-i18n="dlLinDesc">
+                  Portable AppImage plus native Debian/Ubuntu and Fedora/RHEL packages powered by
+                  WebKitGTK 4.1 and Rust.
+                </p>
+              </div>
+              <a
+                class="voxel-btn btn-emerald"
+                href="https://github.com/diorgulescu/skinvil/releases/latest"
+                data-i18n="dlLinBtn"
+              >
+                Download for Linux
+              </a>
+            </div>
+          </div>
+
+          <div class="source-build-box">
+            <h3 data-i18n="buildTitle">Build &amp; Verify from Source</h3>
+            <p data-i18n="buildDesc">
+              Requires Node.js 22.12+ and Rust stable (1.77.2+). Clone the repository, run the
+              automated frontend and Rust test suites, and compile your own native installer:
+            </p>
+            <pre class="code-block"><code>git clone https://github.com/diorgulescu/skinvil.git
+cd skinvil
+npm install
+npm test &amp;&amp; cargo test --manifest-path src-tauri/Cargo.toml
+npm run tauri build</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= OPEN SOURCE & LICENSE ================= -->
+      <section id="open-source" class="section">
+        <div class="container">
+          <div class="oss-panel">
+            <div>
+              <span class="section-eyebrow" data-i18n="ossEyebrow">Free &amp; Open Source</span>
+              <h2 data-i18n="ossTitle">Licensed under GNU GPLv3 (GPL-3.0-only)</h2>
+              <p data-i18n="ossP1">
+                Skinvil is community-developed free software distributed under version 3 of the GNU
+                General Public License. Every line of Rust, TypeScript, GLSL, and CI workflow
+                configuration is publicly auditable on GitHub.
+              </p>
+              <p data-i18n="ossP2">
+                All binary releases are compiled reproducibly inside public GitHub Actions workflows
+                directly from tagged commits, with zero proprietary blobs or closed-source plugins.
+              </p>
+              <div class="oss-links">
+                <a
+                  class="voxel-btn voxel-btn-sm btn-panel"
+                  href="https://github.com/diorgulescu/skinvil"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  GitHub Repository
+                </a>
+                <a
+                  class="voxel-btn voxel-btn-sm btn-panel"
+                  href="https://github.com/diorgulescu/skinvil/blob/main/LICENSE"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  GNU GPLv3 License
+                </a>
+                <a
+                  class="voxel-btn voxel-btn-sm btn-panel"
+                  href="https://github.com/diorgulescu/skinvil/actions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Public CI Builds
+                </a>
+              </div>
+            </div>
+
+            <div class="oss-facts">
+              <div class="oss-fact-row">
+                <span class="oss-fact-label" data-i18n="factLicense">SPDX License</span>
+                <span class="oss-fact-val">GPL-3.0-only</span>
+              </div>
+              <div class="oss-fact-row">
+                <span class="oss-fact-label" data-i18n="factStack">Core Stack</span>
+                <span class="oss-fact-val">Tauri v2 • Rust • TypeScript • Three.js</span>
+              </div>
+              <div class="oss-fact-row">
+                <span class="oss-fact-label" data-i18n="factNetwork">Network / Telemetry</span>
+                <span class="oss-fact-val" data-i18n="factNetworkVal">None (100% Offline)</span>
+              </div>
+              <div class="oss-fact-row">
+                <span class="oss-fact-label" data-i18n="factLocales">Interface Languages</span>
+                <span class="oss-fact-val">English (EN) &amp; Română (RO)</span>
+              </div>
+              <div class="oss-fact-row">
+                <span class="oss-fact-label" data-i18n="factPrice">Price</span>
+                <span class="oss-fact-val" data-i18n="factPriceVal">100% Free Forever</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-links">
+          <a href="https://github.com/diorgulescu/skinvil">Source Code</a>
+          <a href="https://github.com/diorgulescu/skinvil/releases">Releases</a>
+          <a href="https://github.com/diorgulescu/skinvil/blob/main/LICENSE">GNU GPLv3 License</a>
+          <a href="https://github.com/diorgulescu/skinvil/issues">Issue Tracker</a>
+        </div>
+        <div>
+          Copyright &copy; 2026 Skinvil Contributors • Distributed without warranty under the GNU
+          General Public License v3.0 (<code>GPL-3.0-only</code>).
+        </div>
+        <p class="footer-disclaimer" data-i18n="topDisclaimer">
+          NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
+        </p>
+      </div>
+    </footer>
+
+    <!-- ================= SCREENSHOT LIGHTBOX ================= -->
+    <dialog id="lightbox" class="lightbox-dialog" aria-label="Screenshot Preview">
+      <div class="lightbox-bar">
+        <span id="lightbox-caption" class="lightbox-caption"></span>
+        <button type="button" id="lightbox-close" class="lightbox-close">Esc / Close</button>
+      </div>
+      <img id="lightbox-img" class="lightbox-img" src="" alt="" />
+    </dialog>
+
+    <script>
+      (function () {
+        const COPY = {
+          en: {
+            topDisclaimer:
+              'NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
+            brandSub: '3D Voxel Character Skin Forge',
+            navScreenshots: 'Screenshots',
+            navFeatures: 'Features',
+            navDownloads: 'Downloads',
+            navOpenSource: 'Open Source',
+            badgeOffline: '100% Offline • Zero Telemetry',
+            badgeKids: 'Kid-Friendly (Ages 6–12) • EN / RO',
+            badgeGpl: 'Free & Open Source (GNU GPLv3)',
+            heroTitle:
+              'Craft 3D Voxel Skins &amp; Forge <span class="highlight">Ready-to-Play .mcpack</span> Packs',
+            heroLead:
+              'Skinvil is a fast, native desktop studio built with Tauri v2 (Rust), TypeScript, and Three.js. Paint directly on animated 3D characters, toggle armor layers, manage a local Wardrobe, and export multi-skin Minecraft Bedrock .mcpack archives or Java .png textures — completely offline, with zero accounts, zero ads, and zero network calls.',
+            ctaDownload: 'Download Free Installers',
+            ctaTour: 'View Screenshots (3)',
+            ctaSource: 'Browse Source Code',
+            heroOsNote:
+              'Native installers for Windows (x64 .msi / .exe), macOS (Universal & Apple Silicon .dmg), and Linux (.AppImage / .deb / .rpm)',
+            shotsEyebrow: 'Inside the Studio',
+            shotsTitle: 'Three Views of the Skinvil Workflow',
+            shotsSubtitle: 'Click any screenshot to inspect it at full desktop resolution.',
+            zoomLabel: 'Click to enlarge',
+            shot1Badge: '01 • 3D + 2D Studio',
+            shot1Title: 'Zero-Mode-Switching 3D Viewport & Synced 64×64 UV Grid',
+            shot1Desc:
+              'Paint directly onto the 3D voxel model or refine individual texels on the synced 2D UV map — every stroke updates a single 64×64 RGBA canvas with 50-step Undo/Redo.',
+            shot1Bullet1:
+              '<strong>Effortless Desktop Mouse Controls:</strong> Left-click on the character paints immediately; dragging empty space or right-dragging anywhere orbits the camera.',
+            shot1Bullet2:
+              '<strong>12-Part Interactive Mini-Mannequin:</strong> Hide or solo any of the 6 Base parts or 6 Outer armor pieces to paint inner limb surfaces cleanly.',
+            shot1Bullet3:
+              '<strong>Color Workshop &amp; Kid Palettes:</strong> Smooth HSV picker, 12 recent swatches, and 4 curated palettes (Skin Tones, Knights, Hoodies, Nature).',
+            shot2Badge: '02 • Wardrobe & .mcpack',
+            shot2Title: 'Local Character Wardrobe & 1-Click Bedrock .mcpack Forge',
+            shot2Desc:
+              'Save all your creations locally with auto-rendered 2D portraits, mix Classic (Steve 4px) and Slim (Alex 3px) geometries, and bundle multiple characters into one ready-to-install skin pack.',
+            shot2Bullet1:
+              '<strong>Bedrock .mcpack Packager:</strong> Rust generates compliant ZIP-root <code>manifest.json</code>, <code>skins.json</code>, UUIDv4 headers, and <code>texts/en_US.lang</code> files in milliseconds.',
+            shot2Bullet2:
+              '<strong>Java Edition .PNG Export:</strong> Export clean individual <code>.png</code> skin files ready for Minecraft Launcher.',
+            shot2Bullet3:
+              '<strong>6 Offline Templates &amp; Smart Import:</strong> Auto-converts legacy <code>64×32</code> skins to <code>64×64</code> and preserves <code>128×128</code> HD textures.',
+            shot3Badge: '03 • Poses & Bilingual UI',
+            shot3Title: 'Animated Poses, 3D Outer Armor Layer & Bilingual RO / EN UI',
+            shot3Desc:
+              'Collapse the 2D panel for a wide 3D stage, paint 3D helmets, visors, sleeves, and jackets on the Outer layer, and preview your character in motion.',
+            shot3Bullet1:
+              '<strong>Kid-Friendly Auto-Freeze:</strong> Stand, Walk, and Action poses animate smoothly in real time and automatically freeze mid-stroke the instant you paint on a limb.',
+            shot3Bullet2:
+              '<strong>Crisp Per-Face UV Shader:</strong> Custom GLSL clamping eliminates MSAA neighbor-texel bleed on transparent 3D Outer layers.',
+            shot3Bullet3:
+              '<strong>Instant RO | EN Switch:</strong> Built for children ages 6–12 with complete Romanian and English localization and an offline GPLv3 viewer.',
+            featEyebrow: 'Engineered for Simplicity',
+            featTitle: "Everything Young Creators Need — Nothing They Don't",
+            featSubtitle:
+              'Fast Rust + WebGL performance wrapped in chunky, high-contrast voxel controls.',
+            f1Title: 'Voxel Paint Power-Ups',
+            f1Desc:
+              '1px Pencil, smart Eraser (skin-tone fill on Base or transparent clear on Outer), UV-face-bounded Bucket Fill, Eyedropper, Mirror X symmetry, and ±6% Auto-Noise texturing.',
+            f2Title: 'Anatomical Joint Poses',
+            f2Desc:
+              'Base and Outer meshes share anatomical shoulder, neck, and hip pivots across Stand, Walk, Action sprint, and static T-Pose — with manual Play/Pause and automatic brush freeze.',
+            f3Title: 'Classic & Slim Geometry',
+            f3Desc:
+              'Switch live between Classic "Steve" (4px arms) and Slim "Alex" (3px arms), or let Skinvil auto-detect geometry on imported PNGs by inspecting pixel (54, 20) alpha.',
+            f4Title: 'Legacy & HD Skin Support',
+            f4Desc:
+              'Drag and drop any Minecraft skin PNG: Rust validates dimensions, upgrades legacy 64×32 skins into modern 64×64 layout, and preserves unmodified 128×128 HD skins.',
+            f5Title: '100% Offline & Kid-Safe',
+            f5Desc:
+              'Enforced via Tauri Content Security Policy: zero accounts, zero cloud uploads, zero external CDNs, zero ads, and zero analytics or telemetry.',
+            f6Title: 'Lightweight Native App',
+            f6Desc:
+              'Powered by Tauri v2 and Rust rather than bundled Chromium — tiny installer footprint, instant cold startup, and local OS AppData Wardrobe storage.',
+            dlEyebrow: 'Get Skinvil',
+            dlTitle: 'Free Desktop Downloads & Source Builds',
+            dlSubtitle:
+              'All official installers are built transparently from public source code via GitHub Actions and provided free of charge.',
+            dlWinDesc:
+              'Native Windows installer using WebView2. Double-click exported .mcpack files to import straight into Minecraft for Windows (Bedrock).',
+            dlWinBtn: 'Download for Windows',
+            dlMacDesc:
+              'Runs natively on M-series Apple Silicon and Intel Macs. Export Java .png skins or AirDrop .mcpack packs directly to iPad / iPhone!',
+            dlMacBtn: 'Download for macOS',
+            dlLinDesc:
+              'Portable AppImage plus native Debian/Ubuntu and Fedora/RHEL packages powered by WebKitGTK 4.1 and Rust.',
+            dlLinBtn: 'Download for Linux',
+            buildTitle: 'Build & Verify from Source',
+            buildDesc:
+              'Requires Node.js 22.12+ and Rust stable (1.77.2+). Clone the repository, run the automated frontend and Rust test suites, and compile your own native installer:',
+            ossEyebrow: 'Free & Open Source',
+            ossTitle: 'Licensed under GNU GPLv3 (GPL-3.0-only)',
+            ossP1:
+              'Skinvil is community-developed free software distributed under version 3 of the GNU General Public License. Every line of Rust, TypeScript, GLSL, and CI workflow configuration is publicly auditable on GitHub.',
+            ossP2:
+              'All binary releases are compiled reproducibly inside public GitHub Actions workflows directly from tagged commits, with zero proprietary blobs or closed-source plugins.',
+            factLicense: 'SPDX License',
+            factStack: 'Core Stack',
+            factNetwork: 'Network / Telemetry',
+            factNetworkVal: 'None (100% Offline)',
+            factLocales: 'Interface Languages',
+            factPrice: 'Price',
+            factPriceVal: '100% Free Forever',
+          },
+          ro: {
+            topDisclaimer:
+              'NU ESTE UN PRODUS OFICIAL MINECRAFT. NU ESTE APROBAT DE SAU ASOCIAT CU MOJANG SAU MICROSOFT.',
+            brandSub: 'Atelier 3D de Skin-uri Voxel',
+            navScreenshots: 'Capturi Ecran',
+            navFeatures: 'Funcții',
+            navDownloads: 'Descărcare',
+            navOpenSource: 'Open Source',
+            badgeOffline: '100% Offline • Zero Telemetrie',
+            badgeKids: 'Prietenos pentru Copii (6–12 ani) • RO / EN',
+            badgeGpl: 'Gratuit & Open Source (GNU GPLv3)',
+            heroTitle:
+              'Creează Skin-uri 3D Voxel și Făurește Pachete <span class="highlight">.mcpack Gata de Joc</span>',
+            heroLead:
+              'Skinvil este un atelier desktop nativ și rapid construit cu Tauri v2 (Rust), TypeScript și Three.js. Pictează direct pe personaje 3D animate, comută straturile de armură, salvează colecția în Vestiarul local și exportă pachete .mcpack pentru Minecraft Bedrock sau fișiere .png pentru Java — 100% offline, fără conturi, fără reclame și fără conexiuni la internet.',
+            ctaDownload: 'Descarcă Gratuit',
+            ctaTour: 'Vezi Capturile (3)',
+            ctaSource: 'Codul Sursă pe GitHub',
+            heroOsNote:
+              'Instalatoare native pentru Windows (x64 .msi / .exe), macOS (Universal & Apple Silicon .dmg) și Linux (.AppImage / .deb / .rpm)',
+            shotsEyebrow: 'În Interiorul Atelierului',
+            shotsTitle: 'Trei Perspective asupra Atelierului Skinvil',
+            shotsSubtitle: 'Apasă pe orice captură de ecran pentru a o mări la rezoluție completă.',
+            zoomLabel: 'Apasă pentru mărire',
+            shot1Badge: '01 • Studio 3D + 2D',
+            shot1Title: 'Scenă 3D Fără Comutare de Mod & Grilă UV 2D 64×64 Sincronizată',
+            shot1Desc:
+              'Pictează direct pe modelul 3D voxel sau ajustează pixelii pe harta UV 2D sincronizată — fiecare linie actualizează instant aceeași pânză RGBA 64×64 cu 50 de pași Înapoi/Înainte.',
+            shot1Bullet1:
+              '<strong>Control Intuitiv cu Mouse-ul:</strong> Clic-stânga pe personaj pictează imediat; tragerea pe fundal sau clic-dreapta oriunde rotește camera.',
+            shot1Bullet2:
+              '<strong>Mini-Manechin Interactiv cu 12 Părți:</strong> Ascunde sau afișează individual cele 6 părți de bază și 6 piese de armură exterioară.',
+            shot1Bullet3:
+              '<strong>Atelier de Culori &amp; Palete pentru Copii:</strong> Selector HSV fin, 12 culori recente și 4 palete tematice (Piele, Cavaleri, Hanorace, Natură).',
+            shot2Badge: '02 • Vestiar & .mcpack',
+            shot2Title: 'Vestiar Local de Personaje & Făurire .mcpack dintr-un Clic',
+            shot2Desc:
+              'Salvează toate personajele local cu portrete 2D generate automat, combină modele Clasice (Steve 4px) și Subțiri (Alex 3px) și împachetează mai multe skin-uri într-un singur .mcpack.',
+            shot2Bullet1:
+              '<strong>Generator Bedrock .mcpack:</strong> Motorul Rust creează instant <code>manifest.json</code>, <code>skins.json</code>, UUID-uri v4 și <code>texts/en_US.lang</code> direct la rădăcina arhivei.',
+            shot2Bullet2:
+              '<strong>Export .PNG pentru Java Edition:</strong> Exportă texturi individuale <code>.png</code> gata pentru Minecraft Launcher.',
+            shot2Bullet3:
+              '<strong>6 Șabloane Offline &amp; Import Inteligent:</strong> Convertește automat skin-urile vechi <code>64×32</code> la <code>64×64</code> și păstrează texturile HD <code>128×128</code>.',
+            shot3Badge: '03 • Poze Animate & UI Bilingv',
+            shot3Title: 'Poze Animate în Timp Real, Strat 3D Exterior & Interfață RO / EN',
+            shot3Desc:
+              'Restrânge panoul 2D pentru o scenă 3D largă, pictează căști, viziere și jachete pe stratul 3D Exterior și admiră personajul în mișcare.',
+            shot3Bullet1:
+              '<strong>Înghețare Automată la Pictare:</strong> Pozele Stând, Mers și Acțiune se mișcă fluent și îngheață automat în clipa în care pictezi pe personaj.',
+            shot3Bullet2:
+              '<strong>Shader UV Clar pe Fiecare Față:</strong> Elimină complet scurgerea culorilor (MSAA bleed) pe straturile 3D transparente.',
+            shot3Bullet3:
+              '<strong>Comutare Instantă RO | EN:</strong> Creat special pentru copii de 6–12 ani, cu traducere completă în română și engleză.',
+            featEyebrow: 'Creat pentru Simplitate',
+            featTitle: 'Tot ce au Nevoie Micii Creatori — Fără Complicații',
+            featSubtitle:
+              'Performanță nativă Rust + WebGL într-o interfață voxel clară și prietenoasă.',
+            f1Title: 'Super-Puteri de Pictat',
+            f1Desc:
+              'Creion 1px, Radieră inteligentă, Găleată limitată pe fața UV, Pipetă, Oglindă X și Textură automată ±6% pentru detalii bogate.',
+            f2Title: 'Articulații Anatomice 3D',
+            f2Desc:
+              'Stratul de bază și armura exterioară împart aceleași articulații în pozele Stând, Mers, Acțiune și Desfăcut (T), cu buton Pauză/Start și înghețare automată.',
+            f3Title: 'Geometrie Steve & Alex',
+            f3Desc:
+              'Comută live între Steve (brațe 4px) și Alex (brațe 3px) sau lasă aplicația să detecteze automat geometria la importul PNG prin pixelul (54, 20).',
+            f4Title: 'Suport 64×32 Vechi & 128×128 HD',
+            f4Desc:
+              'Trage orice fișier PNG în fereastră: Rust validează dimensiunile, convertește skin-urile 64×32 la 64×64 și păstrează intacte skin-urile HD 128×128.',
+            f5Title: '100% Offline & Sigur',
+            f5Desc:
+              'Protejat prin politica strictă CSP din Tauri: zero conturi, zero încărcări în cloud, zero CDN-uri externe, zero reclame și zero telemetrie.',
+            f6Title: 'Aplicație Nativă Ușoară',
+            f6Desc:
+              'Construit cu Tauri v2 și Rust — instalator mic, pornire instantă și salvare locală în dosarul AppData al sistemului.',
+            dlEyebrow: 'Descarcă Skinvil',
+            dlTitle: 'Instalatoare Desktop Gratuite & Compilare din Sursă',
+            dlSubtitle:
+              'Toate pachetele oficiale sunt compilate transparent din codul sursă public prin GitHub Actions și oferite complet gratuit.',
+            dlWinDesc:
+              'Instalator nativ Windows cu WebView2. Dublu-clic pe fișierul .mcpack exportat îl importă direct în Minecraft for Windows (Bedrock).',
+            dlWinBtn: 'Descarcă pentru Windows',
+            dlMacDesc:
+              'Rulează nativ pe Apple Silicon (seria M) și Intel. Exportă .png pentru Java sau trimite .mcpack prin AirDrop pe iPad / iPhone!',
+            dlMacBtn: 'Descarcă pentru macOS',
+            dlLinDesc:
+              'AppImage portabil plus pachete native Debian/Ubuntu și Fedora/RHEL bazate pe WebKitGTK 4.1 și Rust.',
+            dlLinBtn: 'Descarcă pentru Linux',
+            buildTitle: 'Compilează și Verifică din Codul Sursă',
+            buildDesc:
+              'Necesită Node.js 22.12+ și Rust stabil (1.77.2+). Clonează depozitul, rulează testele automate și construiește propriul instalator nativ:',
+            ossEyebrow: 'Software Liber & Deschis',
+            ossTitle: 'Licențiat sub GNU GPLv3 (GPL-3.0-only)',
+            ossP1:
+              'Skinvil este software liber distribuit sub versiunea 3 a licenței GNU General Public License. Fiecare linie de cod Rust, TypeScript, GLSL și GitHub Actions este publică și verificabilă.',
+            ossP2:
+              'Toate versiunile binare sunt compilate reproductibil în fluxuri publice GitHub Actions direct din etichetele Git, fără componente proprietare.',
+            factLicense: 'Licență SPDX',
+            factStack: 'Tehnologii',
+            factNetwork: 'Rețea / Telemetrie',
+            factNetworkVal: 'Zero (100% Offline)',
+            factLocales: 'Limbi Interfață',
+            factPrice: 'Preț',
+            factPriceVal: '100% Gratuit Mereu',
+          },
+        };
+
+        const langButtons = document.querySelectorAll('.lang-btn');
+        function setLanguage(lang) {
+          const dict = COPY[lang] || COPY.en;
+          document.documentElement.lang = lang;
+          document.querySelectorAll('[data-i18n]').forEach((el) => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.textContent = dict[key];
+          });
+          document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+            const key = el.getAttribute('data-i18n-html');
+            if (dict[key]) el.innerHTML = dict[key];
+          });
+          langButtons.forEach((btn) => {
+            btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+          });
+        }
+
+        langButtons.forEach((btn) => {
+          btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang')));
+        });
+
+        // Lightbox viewer
+        const dialog = document.getElementById('lightbox');
+        const dialogImg = document.getElementById('lightbox-img');
+        const dialogCaption = document.getElementById('lightbox-caption');
+        const closeBtn = document.getElementById('lightbox-close');
+
+        document.querySelectorAll('.js-zoom').forEach((trigger) => {
+          trigger.addEventListener('click', () => {
+            const src = trigger.getAttribute('data-src');
+            const caption = trigger.getAttribute('data-caption') || '';
+            const innerImg = trigger.querySelector('img');
+            dialogImg.src = src;
+            dialogImg.alt = innerImg ? innerImg.alt : caption;
+            dialogCaption.textContent = caption;
+            if (typeof dialog.showModal === 'function') {
+              dialog.showModal();
+            } else {
+              window.open(src, '_blank', 'noopener');
+            }
+          });
+        });
+
+        closeBtn.addEventListener('click', () => dialog.close());
+        dialog.addEventListener('click', (e) => {
+          if (e.target === dialog) dialog.close();
+        });
+      })();
+    </script>
+  </body>
+</html>
